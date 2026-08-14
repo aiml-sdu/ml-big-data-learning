@@ -13,6 +13,7 @@ dist-ssr
 *.local
 .env*
 .qa/screenshots/
+.qa-*.png
 
 # Editor directories and files
 .vscode/*
