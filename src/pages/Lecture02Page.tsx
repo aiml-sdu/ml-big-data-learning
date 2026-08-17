@@ -5,7 +5,7 @@ import { Insight, LessonHero, LessonNav, LessonSection } from '@/components/Pilo
 const quiz: QuizQuestion[] = [
   { id:'mlbd-l2-q1', question:'A missing laboratory result is more common among severely ill patients. What is the safest first response?', options:['Replace every missing value with the global mean','Delete every affected patient','Investigate the missingness mechanism and its relation to the target','Encode missing as zero'], correctIndex:2, explanation:'If missingness is informative, naive deletion or imputation can bias the analysis.' },
   { id:'mlbd-l2-q2', question:'Why can the mean be misleading for strongly right-skewed income data?', options:['It ignores every low value','It is pulled toward the long high-value tail','It is always equal to the mode','It cannot be computed'], correctIndex:1, explanation:'Extreme values in the tail influence the mean more than the median.' },
-  { id:'mlbd-l2-q3', question:'Which transformation makes a value interpretable as ?standard deviations from the mean??', options:['Min?max scaling','Decimal scaling','Z-score normalization','One-hot encoding'], correctIndex:2, explanation:'Z-scoring subtracts the mean and divides by the standard deviation.' },
+  { id:'mlbd-l2-q3', question:"Which transformation makes a value interpretable as 'standard deviations from the mean'?", options:['Min-max scaling','Decimal scaling','Z-score normalization','One-hot encoding'], correctIndex:2, explanation:'Z-scoring subtracts the mean and divides by the standard deviation.' },
   { id:'mlbd-l2-q4', question:'What is the key difference between feature selection and feature extraction?', options:['Selection keeps original features; extraction constructs a new representation','Extraction only removes missing values','Selection always uses PCA','There is no difference'], correctIndex:0, explanation:'Selection chooses a subset of existing variables, while extraction maps them into new features.' },
   { id:'mlbd-l2-q5', question:'What direction does the first principal component choose?', options:['The feature with the largest unit','The direction of maximum projected variance','The class boundary with zero error','The direction with the smallest eigenvalue'], correctIndex:1, explanation:'PC1 is the unit direction that captures the greatest variance in the centered data.' },
   { id:'mlbd-l2-q6', question:'Why must a preprocessing pipeline be fitted on training data only?', options:['To make code run faster','To prevent information from the test set leaking into model development','Because test data cannot contain numbers','To guarantee class balance'], correctIndex:1, explanation:'Using test-set statistics during preprocessing leaks future information and makes evaluation optimistic.' },
@@ -20,12 +20,12 @@ export default function Lecture02Page() {
       <Insight>A suspicious value is a question, not automatically an error. Cleaning is an inference about how the data-generating process behaved.</Insight>
     </LessonSection>
     <LessonSection id="missing-noise" kicker="Choose a defensible repair" title="Missingness and noise are mechanisms">
-      <p>Ignoring a row, imputing a mean, predicting a value, or preserving an explicit ?unknown? category each makes a different assumption. The right choice depends on why the value is absent and how the repaired field will be used.</p>
+      <p>Ignoring a row, imputing a mean, predicting a value, or preserving an explicit 'unknown' category each makes a different assumption. The right choice depends on why the value is absent and how the repaired field will be used.</p>
       <div className="not-prose my-7 grid gap-3 sm:grid-cols-2"><div className="rounded-xl border bg-card p-5"><p className="font-bold">Missing completely at random</p><p className="mt-2 text-sm text-muted-foreground">Absence is unrelated to observed or unobserved values. Simple methods are less likely to bias the sample.</p></div><div className="rounded-xl border bg-card p-5"><p className="font-bold">Informative missingness</p><p className="mt-2 text-sm text-muted-foreground">Absence itself carries signal. Add indicators, model the mechanism, and validate sensitivity.</p></div></div>
-      <p>For noise and outliers, distinguish measurement error from a rare but valid case. Binning, robust statistics, regression, and clustering can reveal patterns?but automatic removal can erase the phenomenon you need to understand.</p>
+      <p>For noise and outliers, distinguish measurement error from a rare but valid case. Binning, robust statistics, regression, and clustering can reveal patterns, but automatic removal can erase the phenomenon you need to understand.</p>
     </LessonSection>
     <LessonSection id="transform" kicker="Make scales comparable" title="Two normalizations answer different questions">
-      <p>Min?max scaling describes position inside an observed range. Z-score normalization describes distance from a mean in standard-deviation units. Manipulate the same income value below.</p>
+      <p>Min-max scaling describes position inside an observed range. Z-score normalization describes distance from a mean in standard-deviation units. Manipulate the same income value below.</p>
       <ScalingLab />
       <Insight>Fit transformation parameters on the training split, then reuse them unchanged on validation and test data. Otherwise evaluation information leaks into training.</Insight>
     </LessonSection>
@@ -43,4 +43,6 @@ export default function Lecture02Page() {
     <LessonNav previous={{to:'/lecture-1',label:'Back to Lecture 01'}} next={{to:'/welcome',label:'Return to course map'}} />
   </>;
 }
+
+
 
