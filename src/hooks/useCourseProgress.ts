@@ -1,54 +1,43 @@
-import { useSyncExternalStore } from 'react';
-import { NAV_TOPICS } from '@/data/nav-topics';
-import { subscribe } from './useSectionProgress';
+import { useCallback, useEffect, useState } from 'react';
+import { courseStorageKey, readStorageJson, writeStorageJson } from '@/lib/courseStorage';
 
-export interface TopicProgress {
-  visited: number;
-  total: number;
-  pct: number;
+const STORAGE_KEY = courseStorageKey('course', 'progress');
+const PROGRESS_EVENT = 'interactive-course-progress-change';
+
+function readProgress(): string[] {
+  if (typeof window === 'undefined') return [];
+
+  return readStorageJson(STORAGE_KEY, (value) => (
+    Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : null
+  )) ?? [];
 }
 
-function getSnapshot(): Map<string, TopicProgress> {
-  const map = new Map<string, TopicProgress>();
-  for (const topic of NAV_TOPICS) {
-    if (topic.locked || topic.sections.length === 0 || topic.countInProgress === false) continue;
-    let visited = 0;
-    for (const section of topic.sections) {
-      if (localStorage.getItem(`visited-${topic.id}-${section.id}`)) visited++;
-    }
-    const total = topic.sections.length;
-    map.set(topic.id, { visited, total, pct: total > 0 ? Math.round((visited / total) * 100) : 0 });
-  }
-  return map;
-}
+export function useCourseProgress() {
+  const [completedSlugs, setCompletedSlugs] = useState<string[]>(readProgress);
 
-// Serialize for useSyncExternalStore equality check
-function getSnapshotKey(): string {
-  let key = '';
-  for (const topic of NAV_TOPICS) {
-    if (topic.locked || topic.sections.length === 0 || topic.countInProgress === false) continue;
-    let visited = 0;
-    for (const section of topic.sections) {
-      if (localStorage.getItem(`visited-${topic.id}-${section.id}`)) visited++;
-    }
-    key += `${topic.id}:${visited},`;
-  }
-  return key;
-}
+  useEffect(() => {
+    const refresh = () => setCompletedSlugs(readProgress());
+    window.addEventListener('storage', refresh);
+    window.addEventListener(PROGRESS_EVENT, refresh);
+    return () => {
+      window.removeEventListener('storage', refresh);
+      window.removeEventListener(PROGRESS_EVENT, refresh);
+    };
+  }, []);
 
-export function useCourseProgress(): Map<string, TopicProgress> {
-  // Use the key for change detection, but return the actual map
-  useSyncExternalStore(subscribe, getSnapshotKey);
-  return getSnapshot();
-}
+  const setCompleted = useCallback((slug: string, completed: boolean) => {
+    const current = readProgress();
+    const next = completed
+      ? Array.from(new Set([...current, slug]))
+      : current.filter((item) => item !== slug);
 
-export function getTopicProgress(topicId: string): TopicProgress {
-  const topic = NAV_TOPICS.find((t) => t.id === topicId);
-  if (!topic || topic.sections.length === 0 || topic.countInProgress === false) return { visited: 0, total: 0, pct: 0 };
-  let visited = 0;
-  for (const section of topic.sections) {
-    if (localStorage.getItem(`visited-${topic.id}-${section.id}`)) visited++;
-  }
-  const total = topic.sections.length;
-  return { visited, total, pct: total > 0 ? Math.round((visited / total) * 100) : 0 };
+    writeStorageJson(STORAGE_KEY, next);
+    window.dispatchEvent(new Event(PROGRESS_EVENT));
+  }, []);
+
+  return {
+    completedSlugs,
+    isCompleted: (slug: string) => completedSlugs.includes(slug),
+    setCompleted,
+  };
 }

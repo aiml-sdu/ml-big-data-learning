@@ -1,229 +1,189 @@
-import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import confetti from 'canvas-confetti';
-import { RotateCcw, Check, X, BookOpen } from 'lucide-react';
-import { useLeitnerBox } from '@/hooks/useLeitnerBox';
-import { MathText } from '@/components/Math';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import type { Flashcard, TopicId } from '@/types/study';
+import { useEffect, useId, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, Check, RotateCcw, Undo2 } from 'lucide-react';
+import { courseStorageKey, readStorageJson, removeStorageValue, writeStorageJson } from '@/lib/courseStorage';
 
-interface FlashcardDeckProps {
-  cards: Flashcard[];
-  topicId?: TopicId;
-  compact?: boolean;
+export interface Flashcard {
+  id: string;
+  prompt: string;
+  answer: string;
+  explanation?: string;
 }
 
-const BOX_LABELS: Record<1 | 2 | 3, string> = { 1: 'Learning', 2: 'Reviewing', 3: 'Mastered' };
+interface FlashcardDeckProps {
+  title: string;
+  cards: Flashcard[];
+  storageKey?: string;
+  onComplete?: () => void;
+}
 
-export default function FlashcardDeck({ cards, topicId, compact }: FlashcardDeckProps) {
-  const { getDueCards, markCorrect, markWrong, getProgress, getBox, reset } = useLeitnerBox(cards);
+type CardRating = 'again' | 'got-it';
 
-  const dueCards = getDueCards(topicId);
-  const progress = getProgress(topicId);
+interface DeckState {
+  index: number;
+  revealed: Set<string>;
+  ratings: Record<string, CardRating>;
+}
 
-  const [index, setIndex] = useState(0);
-  const [flipped, setFlipped] = useState(false);
-  const [finished, setFinished] = useState(false);
+function getPersistenceKey(storageKey?: string) {
+  return storageKey ? courseStorageKey('flashcard-deck', storageKey) : null;
+}
+
+function loadDeckState(storageKey: string | undefined, cards: Flashcard[]): DeckState {
+  const key = getPersistenceKey(storageKey);
+  const empty = { index: 0, revealed: new Set<string>(), ratings: {} };
+  if (!key) return empty;
+  const cardIds = new Set(cards.map((card) => card.id));
+
+  return readStorageJson(key, (value) => {
+    if (!value || typeof value !== 'object') return null;
+    const saved = value as { version?: unknown; index?: unknown; revealedIds?: unknown; ratings?: unknown };
+    if (saved.version !== 1 || !Number.isInteger(saved.index) || !Array.isArray(saved.revealedIds) || !saved.ratings || typeof saved.ratings !== 'object') return null;
+
+    const revealed = new Set(saved.revealedIds.filter((id): id is string => typeof id === 'string' && cardIds.has(id)));
+    const ratings = Object.fromEntries(Object.entries(saved.ratings).filter(([id, rating]) => (
+      cardIds.has(id) && (rating === 'again' || rating === 'got-it')
+    ))) as Record<string, CardRating>;
+    return {
+      index: Math.min(Math.max(saved.index as number, 0), cards.length),
+      revealed,
+      ratings,
+    };
+  }) ?? empty;
+}
+
+export function FlashcardDeck({ title, cards, storageKey, onComplete }: FlashcardDeckProps) {
+  const titleId = useId();
+  const cardSignature = cards.map((card) => card.id).join('\u001f');
+  const [state, setState] = useState<DeckState>(() => loadDeckState(storageKey, cards));
+  const completionReported = useRef(false);
+  const complete = state.index >= cards.length;
+  const current = complete ? null : cards[state.index];
+  const revealed = current ? state.revealed.has(current.id) : false;
+  const rating = current ? state.ratings[current.id] : undefined;
+  const ratedCount = cards.filter((card) => state.ratings[card.id]).length;
+  const gotItCount = cards.filter((card) => state.ratings[card.id] === 'got-it').length;
 
   useEffect(() => {
-    if (index >= dueCards.length && dueCards.length > 0) {
-      setIndex(dueCards.length - 1);
-    }
-    if (dueCards.length === 0 && progress.total > 0) {
-      setFinished(true);
-    }
-  }, [dueCards.length, index, progress.total]);
+    setState(loadDeckState(storageKey, cards));
+    completionReported.current = false;
+  }, [cardSignature, storageKey]);
 
-  const flip = useCallback(() => setFlipped((f) => !f), []);
-
-  const handleCorrect = useCallback(() => {
-    if (!dueCards[index]) return;
-    markCorrect(dueCards[index].id);
-    setFlipped(false);
-  }, [dueCards, index, markCorrect]);
-
-  const handleWrong = useCallback(() => {
-    if (!dueCards[index]) return;
-    markWrong(dueCards[index].id);
-    setFlipped(false);
-  }, [dueCards, index, markWrong]);
-
-  // Keyboard shortcuts
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key === ' ') { e.preventDefault(); flip(); }
-      if (e.key === 'ArrowRight' && flipped) handleCorrect();
-      if (e.key === 'ArrowLeft' && flipped) handleWrong();
+    const key = getPersistenceKey(storageKey);
+    if (key) writeStorageJson(key, {
+      version: 1,
+      index: state.index,
+      revealedIds: [...state.revealed],
+      ratings: state.ratings,
+    });
+
+    if (!complete) {
+      completionReported.current = false;
+      return;
     }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [flip, flipped, handleCorrect, handleWrong]);
-
-  // Confetti when all mastered
-  useEffect(() => {
-    if (finished && progress.mastered === progress.total && progress.total > 0) {
-      confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+    if (!completionReported.current) {
+      completionReported.current = true;
+      onComplete?.();
     }
-  }, [finished, progress.mastered, progress.total]);
+  }, [complete, onComplete, state, storageKey]);
 
-  const pctLearning = progress.total ? (progress.learning / progress.total) * 100 : 0;
-  const pctReviewing = progress.total ? (progress.reviewing / progress.total) * 100 : 0;
-  const pctMastered = progress.total ? (progress.mastered / progress.total) * 100 : 0;
+  const reset = () => {
+    const key = getPersistenceKey(storageKey);
+    if (key) removeStorageValue(key);
+    setState({ index: 0, revealed: new Set(), ratings: {} });
+  };
 
-  const current = dueCards[index];
-  const currentBox = current ? getBox(current.id) : 1;
+  if (cards.length === 0) {
+    return <p className="flashcard-empty">This deck has no cards yet.</p>;
+  }
+
+  if (complete) {
+    return (
+      <section className="flashcard-deck flashcard-complete" aria-labelledby={titleId}>
+        <p className="eyebrow">Deck complete</p>
+        <h3 id={titleId}>{title}</h3>
+        <p>You marked {gotItCount} of {cards.length} cards as recalled. A self-rating is a study signal, not a grade.</p>
+        <div className="flashcard-actions">
+          <button className="button button-secondary" onClick={() => setState((previous) => ({ ...previous, index: 0 }))}>
+            <ArrowLeft size={15} /> Review cards
+          </button>
+          <button className="button button-quiet" onClick={reset}><RotateCcw size={15} /> Reset deck</button>
+        </div>
+      </section>
+    );
+  }
+
+  if (!current) return <p className="flashcard-empty">This deck could not load its current card.</p>;
 
   return (
-    <Card className={cn('my-6 overflow-hidden', compact && 'my-4')}>
-      {!compact && (
-        <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <BookOpen className="size-4 text-primary" />
-            <span className="font-semibold text-sm">Flashcards</span>
+    <section className="flashcard-deck" aria-labelledby={titleId}>
+      <div className="flashcard-heading">
+        <div><p className="eyebrow">Recall practice</p><h3 id={titleId}>{title}</h3></div>
+        <span>{state.index + 1} / {cards.length}</span>
+      </div>
+      <div className="mini-progress" role="progressbar" aria-label="Cards rated" aria-valuemin={0} aria-valuemax={cards.length} aria-valuenow={ratedCount}>
+        <span style={{ width: `${Math.round((ratedCount / cards.length) * 100)}%` }} />
+      </div>
+      <div className="flashcard" aria-live="polite">
+        <p className="flashcard-label">Prompt</p>
+        <p className="flashcard-prompt">{current.prompt}</p>
+        {!revealed ? (
+          <button
+            type="button"
+            className="button button-primary"
+            onClick={() => setState((previous) => ({
+              ...previous,
+              revealed: new Set([...previous.revealed, current.id]),
+            }))}
+          >
+            Show answer
+          </button>
+        ) : (
+          <div className="flashcard-answer">
+            <p className="flashcard-label">Answer</p>
+            <strong>{current.answer}</strong>
+            {current.explanation && <p>{current.explanation}</p>}
           </div>
-          <Button variant="ghost" size="sm" onClick={() => { reset(topicId); setFinished(false); setIndex(0); }}>
-            <RotateCcw className="size-3.5 mr-1" /> Reset
-          </Button>
+        )}
+      </div>
+      {revealed && (
+        <div className="flashcard-rating" aria-label="Rate your recall">
+          <button
+            type="button"
+            className={`button button-secondary ${rating === 'again' ? 'is-selected' : ''}`}
+            aria-pressed={rating === 'again'}
+            onClick={() => setState((previous) => ({ ...previous, ratings: { ...previous.ratings, [current.id]: 'again' } }))}
+          >
+            <Undo2 size={15} /> Review again
+          </button>
+          <button
+            type="button"
+            className={`button button-secondary ${rating === 'got-it' ? 'is-selected' : ''}`}
+            aria-pressed={rating === 'got-it'}
+            onClick={() => setState((previous) => ({ ...previous, ratings: { ...previous.ratings, [current.id]: 'got-it' } }))}
+          >
+            <Check size={15} /> I recalled it
+          </button>
         </div>
       )}
-
-      {/* Progress bar */}
-      <div className="mx-4 mb-3 flex h-2 rounded-full overflow-hidden bg-muted">
-        {pctLearning > 0 && (
-          <div className="bg-red-400 transition-all duration-300" style={{ width: `${pctLearning}%` }} title={`Learning: ${progress.learning}`} />
-        )}
-        {pctReviewing > 0 && (
-          <div className="bg-amber-400 transition-all duration-300" style={{ width: `${pctReviewing}%` }} title={`Reviewing: ${progress.reviewing}`} />
-        )}
-        {pctMastered > 0 && (
-          <div className="bg-green-500 transition-all duration-300" style={{ width: `${pctMastered}%` }} title={`Mastered: ${progress.mastered}`} />
-        )}
+      <div className="flashcard-navigation">
+        <button
+          type="button"
+          className="button button-quiet"
+          disabled={state.index === 0}
+          onClick={() => setState((previous) => ({ ...previous, index: Math.max(0, previous.index - 1) }))}
+        >
+          <ArrowLeft size={15} /> Previous
+        </button>
+        <button
+          type="button"
+          className="button button-primary"
+          disabled={!rating}
+          onClick={() => setState((previous) => ({ ...previous, index: Math.min(cards.length, previous.index + 1) }))}
+        >
+          {state.index === cards.length - 1 ? 'Finish deck' : 'Next card'} <ArrowRight size={15} />
+        </button>
       </div>
-
-      <div className="px-4 pb-4">
-        {/* Legend */}
-        <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
-          <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-red-400" /> Learning ({progress.learning})</span>
-          <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-amber-400" /> Reviewing ({progress.reviewing})</span>
-          <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-green-500" /> Mastered ({progress.mastered})</span>
-        </div>
-
-        {finished || dueCards.length === 0 ? (
-          <div className="text-center py-8 space-y-2">
-            {progress.mastered === progress.total ? (
-              <>
-                <p className="text-2xl font-bold">All cards mastered!</p>
-                <p className="text-sm text-muted-foreground">Come back later for spaced review.</p>
-              </>
-            ) : (
-              <>
-                <p className="text-lg font-semibold">No cards due right now</p>
-                <p className="text-sm text-muted-foreground">
-                  {progress.reviewing} reviewing (due tomorrow) &middot; {progress.mastered} mastered (due in 3 days)
-                </p>
-              </>
-            )}
-            <Button variant="outline" size="sm" onClick={() => { reset(topicId); setFinished(false); setIndex(0); }}>
-              <RotateCcw className="size-3.5 mr-1" /> Start Over
-            </Button>
-          </div>
-        ) : current ? (
-          <>
-            {/* Card counter + box badge */}
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs text-muted-foreground">
-                Card {index + 1} of {dueCards.length} due
-              </p>
-              <span className={cn(
-                'text-[10px] font-semibold px-2 py-0.5 rounded-full',
-                currentBox === 1 && 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300',
-                currentBox === 2 && 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
-                currentBox === 3 && 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300',
-              )}>
-                {BOX_LABELS[currentBox]}
-              </span>
-            </div>
-
-            {/* Flip card */}
-            <div
-              className="relative cursor-pointer select-none"
-              style={{ perspective: 1000, minHeight: compact ? 180 : 220 }}
-              onClick={flip}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter') flip(); }}
-              aria-label={flipped ? 'Card back — click to flip' : 'Card front — click to flip'}
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={flipped ? 'back' : 'front'}
-                  initial={{ rotateY: flipped ? -90 : 90, opacity: 0 }}
-                  animate={{ rotateY: 0, opacity: 1 }}
-                  exit={{ rotateY: flipped ? 90 : -90, opacity: 0 }}
-                  transition={{ duration: 0.25, ease: 'easeOut' }}
-                  style={{
-                    minHeight: compact ? 180 : 220,
-                    backfaceVisibility: 'hidden',
-                    transformStyle: 'preserve-3d',
-                  }}
-                  className={cn(
-                    'rounded-xl p-6 flex flex-col items-center justify-center text-center',
-                    !flipped && 'bg-gradient-to-br from-card to-muted/30 border-2 border-border shadow-sm',
-                    flipped && 'bg-gradient-to-br from-primary/5 to-primary/10 border-2 border-primary/30 shadow-sm',
-                  )}
-                >
-                  {!flipped ? (
-                    <>
-                      <p className="text-lg font-semibold leading-relaxed"><MathText>{current.front}</MathText></p>
-                      <p className="text-[11px] text-muted-foreground mt-4 tracking-wide uppercase">
-                        Tap to reveal &middot; Space
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-[15px] leading-relaxed"><MathText>{current.back}</MathText></p>
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* Answer buttons — Anki-style */}
-            {flipped && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="flex justify-center gap-3 mt-4"
-              >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleWrong}
-                  className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950 px-5"
-                >
-                  <X className="size-3.5 mr-1.5" /> Again
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleCorrect}
-                  className="bg-green-600 hover:bg-green-700 text-white px-5"
-                >
-                  <Check className="size-3.5 mr-1.5" /> Good
-                </Button>
-              </motion.div>
-            )}
-
-            {/* Keyboard hint */}
-            {flipped && (
-              <p className="text-center text-[10px] text-muted-foreground mt-2">
-                &larr; Again &middot; Good &rarr;
-              </p>
-            )}
-          </>
-        ) : null}
-      </div>
-    </Card>
+    </section>
   );
 }

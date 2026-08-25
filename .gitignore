@@ -1,27 +1,19 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
+node_modules/
+dist/
+.DS_Store
 *.local
 .env*
-.qa/screenshots/
-.qa-*.png
+!.env.example
+coverage/
+*.tsbuildinfo
+playwright-report/
+test-results/
+CLAUDE.local.md
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Local reference implementation; not part of the distributable template.
+/example/
+
+# Instructor-owned slide decks stay local. Source locators remain in the project,
+# but the original PowerPoint files are never published with the site.
+/materials/slides/*.pptx
+/materials/slides/*.ppt
