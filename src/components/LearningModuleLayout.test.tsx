@@ -15,7 +15,7 @@ vi.mock('@/hooks/useCourseProgress', () => ({
 const currentModule: LearningModule = {
   slug: 'current',
   number: 2,
-  title: 'Current module',
+  title: 'Current lecture',
   summary: 'A module used to verify the shared sequence navigation.',
   estimatedMinutes: 10,
   objectives: ['use the shared navigation'],
@@ -39,10 +39,10 @@ describe('LearningModuleLayout', () => {
       </MemoryRouter>,
     );
 
-    const navigation = screen.getByRole('navigation', { name: 'Module sequence' });
-    expect(within(navigation).getByRole('link', { name: /previous module introduction/i }))
-      .toHaveAttribute('href', '/modules/introduction');
-    expect(within(navigation).getByRole('link', { name: /next module application/i }))
-      .toHaveAttribute('href', '/modules/application');
+    const navigation = screen.getByRole('navigation', { name: 'Lecture sequence' });
+    expect(within(navigation).getByRole('link', { name: /previous lecture introduction/i }))
+      .toHaveAttribute('href', '/lectures/introduction');
+    expect(within(navigation).getByRole('link', { name: /next lecture application/i }))
+      .toHaveAttribute('href', '/lectures/application');
   });
 });

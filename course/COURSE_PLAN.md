@@ -1,165 +1,82 @@
 # Course plan
 
-Status: **pilot in implementation; instructor review pending**
+Status: **ready**
 
-Lifecycle stage: **pilot**
+Lifecycle stage: **release**
 
 ## Course promise
+Practice the reasoning behind learning paradigms, data preparation, and clustering through three lecture paths.
 
-This platform helps master's students turn machine-learning and big-data concepts into decisions they can explain, test, and reuse in a new analytics problem.
+## Confirmed scope
+Use the supplied three PDFs and two notebooks; use the downloaded repository as the template; preview locally before deployment. Organize by lectures, use a white background, add game-like challenges, quizzes and visualizations, and omit student-facing slide pointers.
 
-## Audience and role
-
-- Learners: master's students in Machine Learning and Big Data Analytics
-- Prior knowledge: introductory statistics and programming are assumed for the pilot, pending confirmation
-- Platform role: intuition-first companion and revision environment
-- Relationship to assessment: formative only; no grades, analytics, login, or instructor reporting
-
-## Learner model
-
-- Learners have seen basic data tables and programming constructs, but their mathematical and distributed-systems experience may vary.
-- They can describe familiar ML examples but may not yet distinguish the learning signal, output type, data-quality failure, or scaling pressure that governs a technical choice.
-- Likely sticking points include treating labels as a minor detail, using big data as a synonym for volume, cleaning data without diagnosing the failure, assuming normalization methods are interchangeable, and assuming more features always improve a model.
-- The platform uses concise technical English, visible terminology, keyboard alternatives, and persistent feedback to support variation in confidence and language fluency.
-
-## Course-level outcomes
-
-1. Classify an analytics task by learning paradigm, output structure, and required data signal.
-2. Explain when data volume, variety, velocity, workload, and latency change the processing architecture.
-3. Diagnose incomplete, noisy, inconsistent, redundant, and high-dimensional data before choosing a remedy.
-4. Apply and compare common transformations, reductions, and feature-engineering decisions.
-5. Choose, implement, and evaluate suitable ML methods for clustering, regression, classification, neural networks, and ensembles.
-6. Explain how Hadoop, MapReduce, Spark, MLlib, NoSQL systems, and streaming architectures support data-intensive analytics.
+## Design assumptions
+English, formative practice, basic arithmetic and Python familiarity for lab preparation. No grading, login, analytics, or synchronized progress. Time estimates are author estimates. Course learning goals are draft instructional interpretations, not approved official outcomes.
 
 ## Course visual direction
+- Representative source evidence and locators: Lecture 1 p. 1, Lecture 2 p. 29, Lecture 3 p. 35, visually inspected. White technical pages with blue conceptual emphasis.
+- Direction: white, precise, tactile, exploratory.
+- White page backgrounds explicitly requested; system fonts; blue actions and labelled scientific plots. No copied logos, photos, or fonts.
+- Instructor approval: current composition approved through the explicit deployment request on 2026-09-06.
 
-- Direction: technical, restrained, spacious, analytical
-- Representative source evidence and locators: Lecture 1 slides 1 and 64; Lecture 2 slides 14, 31, and 59
-- Cues to preserve: strong dark typography, generous white space, simple blue quantitative marks, direct institutional tone
-- Traits to adapt or reject: replace dense bullet pages and tiny embedded labels; avoid copied logos, photographs, and third-party figures
-- Light palette: warm off-white background, white surface, pale blue-grey secondary surface, charcoal text, blue accent
-- Dark palette: deep navy background, blue-grey surfaces, near-white text, lighter blue accent
-- Typography: system sans-serif for reliable publishing; strong weight contrast instead of decorative fonts
-- Geometry and density: balanced corners, one cognitive task per main section, compact supporting controls
-- Data graphics: labelled line and point marks, non-colour state cues, text descriptions, and course-neutral SVG where needed
-- Brand and asset rights: institution name in text only; SDU logo and slide imagery remain unapproved
-- Instructor approval: pending
-
-## Concept map and difficult transitions
-
-- A task begins with the signal available to learn from. Labels support supervised learning, structure without labels supports unsupervised learning, and rewards support reinforcement learning.
-- The output type then narrows the task. Continuous values imply regression while discrete categories imply classification; many outputs add a second dimension to the decision.
-- Data scale is not only size. Variety changes representation, velocity changes latency, and workloads determine whether transactional, analytical, batch, or streaming systems fit.
-- Model quality depends on data quality. Missingness, noise, inconsistency, redundancy, scale, and dimensionality require different diagnoses.
-- Feature selection keeps original variables. Feature extraction constructs a new representation. PCA is one extraction method that preserves as much variance as possible under a linear projection.
-- Later modelling modules depend on these decisions, and the distributed-systems modules explain how the same pipeline changes when one machine is no longer enough.
-
-## Proposed modules
-
-| No. | Module | Source boundary | Intended outcome | Conceptual hinge or misconception | Interaction family and learner action | Connection | Status |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Choose the learning signal | Lecture 1, slides 7-44 | Classify a task by learning signal and output type | The model family follows the evidence available, not the buzzword in the application | Classification challenge: choose, receive feedback, transfer | opens the course language | implementing |
-| 2 | When data changes the architecture | Lecture 1, slides 45-92 | Diagnose scale pressure and match batch, analytical, or streaming architecture | Big data is volume plus representation, latency, workload, and coordination pressure | Parameter explorer and architecture diagnosis | prepares distributed systems | implemented |
-| 3 | Lecture 1 field check | Lecture 1, slides 7-92 | Retrieve and apply the two core decisions in fresh cases | Recognition of terms can hide weak task framing | Mixed formative practice | consolidates Lecture 1 | implemented |
-| 4 | Diagnose before you transform | Lecture 2, slides 3-30 | Identify a data-quality failure and select a defensible remedy | Missing, noisy, inconsistent, and redundant data are not one problem | Data diagnosis cases and scaling explorer | prepares feature engineering | implemented |
-| 5 | Compress a feature space | Lecture 2, slides 31-66 | Distinguish selection, extraction, and PCA; reason about retained variance | More features can increase sample needs and noise | Dimension explorer and PCA projection | prepares clustering and models | implemented |
-| 6 | Lecture 2 pipeline check | Lecture 2, slides 3-67 | Build and justify a preprocessing sequence on a fresh dataset | A pipeline must be chosen from the failure and target model | Mixed formative practice and ordering | consolidates Lecture 2 | implemented |
-| 7 | Discover groups without labels | Lecture 3, full deck | Explain and apply clustering mechanisms | Similarity and cluster validity depend on representation and scale | to be defined after source inspection | depends on preprocessing | proposed |
-| 8 | Fit and interpret regression | Lecture 4, full deck | Fit, interpret, and diagnose linear regression | Fit, assumptions, and generalization are separate questions | to be defined after source inspection | uses transformed features | proposed |
-| 9 | Build a classification decision | Lecture 5, full deck | Compare fundamental classifiers and their decision boundaries | Similar training accuracy can hide different inductive biases | to be defined after source inspection | builds on supervised framing | proposed |
-| 10 | Learn with neural networks | Lecture 6, full deck | Trace forward learning and parameter updates | Depth and nonlinearity change representation, not the learning objective | to be defined after source inspection | extends supervised models | proposed |
-| 11 | Combine and evaluate models | Lecture 7, full deck | Compare ensemble mechanisms and evaluation evidence | Better training fit is not better generalization | to be defined after source inspection | supports model choice | proposed |
-| 12 | Compute with Hadoop and MapReduce | Lecture 8, full deck | Trace distributed storage and MapReduce execution | The framework separates the requested computation from fault-tolerant execution | to be defined after source inspection | realizes Lecture 1 architecture | proposed |
-| 13 | Work with Spark | Lecture 9 decks, full decks | Explain Spark execution and use core programming patterns | Lazy plans, partitions, and actions govern performance | to be defined after source inspection | builds on MapReduce | proposed |
-| 14 | Scale ML with MLlib | Lecture 10, full deck | Build and evaluate an ML pipeline in Spark | Distributed model APIs still require sound data and evaluation choices | to be defined after source inspection | joins ML and big data | proposed |
-| 15 | Choose a distributed data store | Lecture 11, full deck | Compare NoSQL and distributed storage models | Access pattern and consistency needs shape the store | to be defined after source inspection | extends workload decisions | proposed |
-| 16 | Reason about fast data | Lecture 12, full deck | Trace streaming state, latency, and fault tolerance | Streaming is an evolving computation, not repeated batch by default | to be defined after source inspection | closes architecture sequence | proposed |
-
-## Shared conventions
-
-- Language and terminology: English; preserve source terms and define them in plain language before using them formally
-- Mathematical and code notation: introduce symbols beside a numeric or visual example; never rely on a broken source glyph
-- Feedback style: explain the governing rule and the tempting misconception; keep feedback visible until explicit continuation
-- Interaction rhythm: concrete case, learner commitment, visible consequence, formal name, near miss, fresh transfer
-- Visual system: course-wide theme only; concept diagrams inherit shared controls and feedback states
-- Release constraints: original decks, logos, third-party images, and restricted material stay out of the production bundle
-- Navigation and progress: shared registry and winding course path
-- Practice strategy: embedded checks plus one integrated practice module after each implemented lecture sequence
-- Practice feedback and retry: immediate explanation, explicit continue, revisit, and reset; no grades or attempt limits
-- Browser storage namespace: `sdu-ml-big-data-2026`
-
-## Material inventory
-
-| Path | Type | Relevant topics | Publication constraint | Notes |
-| --- | --- | --- | --- | --- |
-| `materials/course-info.md` | context | course-wide | repository source | Current assumptions and open decisions |
-| `materials/slides/Lecture1-Introduction to Big Data Analytics.pptx` | PowerPoint, 93 slides | learning paradigms, big data, workloads, cloud, batch and streaming | local authoring only | text and rendered slides inspected; 33 note files mostly empty |
-| `materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pptx` | PowerPoint, 67 slides | exploration, cleaning, transformation, reduction, PCA | local authoring only | text and rendered slides inspected; some equation glyphs need source review |
-| `Lecture3-Clustering.pptx` | PowerPoint, 64 slides | clustering | external authoring source | filename and slide count inventoried only |
-| `Lecture4-Linear Models for Regression.pptx` | PowerPoint, 81 slides | regression | external authoring source | filename and slide count inventoried only |
-| `Lecture5-Fundamental Classification Algorithms.pptx` | PowerPoint, 90 slides | classification | external authoring source | filename and slide count inventoried only |
-| `Lecture6-Artificial Neural Networks.pptx` | PowerPoint, 80 slides | neural networks | external authoring source | filename and slide count inventoried only |
-| `Lecture7-Ensemble Methods and Model Evaluations.pptx` | PowerPoint, 83 slides | ensembles and evaluation | external authoring source | filename and slide count inventoried only |
-| `Lecture8-Hadoop Fundamentals and MapReduce.pptx` | PowerPoint, 115 slides | Hadoop and MapReduce | external authoring source | filename and slide count inventoried only |
-| `Lecture9-Apache Spark Essentials.pptx` | PowerPoint, 64 slides | Spark | external authoring source | filename and slide count inventoried only |
-| `Lecture9-Spark Programming Using Scala.pptx` | PowerPoint, 48 slides | Spark programming and Scala | external authoring source | filename and slide count inventoried only |
-| `Lecture10-Machine Learning with MlLib.pptx` | PowerPoint, 85 slides | MLlib | external authoring source | filename and slide count inventoried only |
-| `Lecture11-NoSQL Databases and distributed data storages.pptx` | PowerPoint, 75 slides | NoSQL and distributed stores | external authoring source | filename and slide count inventoried only |
-| `Lecture12-Data Streaming and Fast Data.pptx` | PowerPoint, 60 slides | streaming and fast data | external authoring source | filename and slide count inventoried only |
+## Lecture structure
+- Lecture 1: What can a machine learn?; Choose a data architecture.
+- Lecture 2: Make the data comparable; Keep the useful directions; Lab · Explore the Chicago data.
+- Lecture 3: Build clusters one step at a time; Beyond round clusters; Are these clusters useful?; Lab · Compare clustering methods.
 
 ## Content coverage ledger
 
 | ID | Source and locator | Required content or performance | Importance | Destination | Evidence | Status | Decision note |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `COV-001` | Lecture 1, slides 7-21 | Distinguish supervised regression, classification, univariate, and multivariate outputs | core | choose-learning-signal | problem framing, classification activity, transfer check | implemented | instructor review pending |
-| `COV-002` | Lecture 1, slides 24-34 | Explain unsupervised learning through clustering and generative examples | core | choose-learning-signal | explanation, contrast, classification activity | implemented | instructor review pending |
-| `COV-003` | Lecture 1, slides 35-37 | Identify states, actions, rewards, and the main reinforcement-learning difficulties | supporting | choose-learning-signal | mechanism explanation and fresh-case feedback | implemented | instructor review pending |
-| `COV-004` | Lecture 1, slides 38-44 | Explain self-supervised pretraining, model scale, data curation, and compute pressure | supporting | choose-learning-signal | contrast section and task classification | implemented | instructor review pending |
-| `COV-005` | Lecture 1, slides 45-50 | Diagnose volume, variety, and velocity as distinct data pressures | core | data-changes-architecture | parameter explorer and transfer scenario | implemented | instructor review pending |
-| `COV-006` | Lecture 1, slides 51-58 | Compare OLTP, OLAP, ETL, data warehouses, and Hadoop batch support | core | data-changes-architecture | workload comparison and architecture diagnosis | implemented | instructor review pending |
-| `COV-007` | Lecture 1, slides 59-73 | Explain parallelization challenges and the separation of computation from execution | core | data-changes-architecture | worker simulation and what-versus-how explanation | implemented | instructor review pending |
-| `COV-008` | Lecture 1, slides 74-92 | Match batch, real-time store, streaming, and lambda-style use cases to latency needs | core | data-changes-architecture | architecture cases and fresh transfer | implemented | instructor review pending |
-| `COV-009` | Lecture 2, slides 3-4 and 18-27 | Diagnose incomplete, noisy, inconsistent, duplicate, and redundant data | core | diagnose-before-transform | case classification and reasoning feedback | implemented | instructor review pending |
-| `COV-010` | Lecture 2, slides 5-16 | Use visualization and descriptive statistics to inspect patterns, skew, dispersion, outliers, and correlation | supporting | diagnose-before-transform | visual comparison and interpretation check | implemented | instructor review pending |
-| `COV-011` | Lecture 2, slides 19-24 | Choose a defensible treatment for missing or noisy data and explain its tradeoff | core | diagnose-before-transform | remediation cases and near-miss feedback | implemented | instructor review pending |
-| `COV-012` | Lecture 2, slides 28-29 | Apply min-max and z-score normalization and distinguish their interpretation | core | diagnose-before-transform | scaling explorer and calculation transfer | implemented | instructor review pending |
-| `COV-013` | Lecture 2, slides 31-40 | Explain the curse of dimensionality and distinguish feature selection, extraction, and numerosity reduction | core | compress-feature-space | dimension explorer and classification cases | implemented | instructor review pending |
-| `COV-014` | Lecture 2, slides 41-50 | Explain PCA as a lower-dimensional projection that retains high-variance directions | core | compress-feature-space | projection visual and reconstruction comparison | implemented | instructor review pending |
-| `COV-015` | Lecture 2, slides 51-59 | Connect covariance, eigenvectors, eigenvalues, and explained variance to choosing components | supporting | compress-feature-space | linked explanation and scree-style transfer | implemented | equation glyphs require instructor check |
-| `COV-016` | Lecture 2, slides 64-66 | Interpret the compression tradeoff in the image-patch example | supporting | compress-feature-space | application comparison | implemented | original images will not be republished |
-| `COV-FUTURE-03` | Lecture 3, full deck | Inspect and map clustering content before implementation | unresolved | future onboarding | no learner evidence yet | unassigned | source not yet inspected in detail |
-| `COV-FUTURE-04` | Lecture 4, full deck | Inspect and map regression content before implementation | unresolved | future onboarding | no learner evidence yet | unassigned | source not yet inspected in detail |
-| `COV-FUTURE-05` | Lecture 5, full deck | Inspect and map classification content before implementation | unresolved | future onboarding | no learner evidence yet | unassigned | source not yet inspected in detail |
-| `COV-FUTURE-06` | Lecture 6, full deck | Inspect and map neural-network content before implementation | unresolved | future onboarding | no learner evidence yet | unassigned | source not yet inspected in detail |
-| `COV-FUTURE-07` | Lecture 7, full deck | Inspect and map ensemble and evaluation content before implementation | unresolved | future onboarding | no learner evidence yet | unassigned | source not yet inspected in detail |
-| `COV-FUTURE-08` | Lecture 8, full deck | Inspect and map Hadoop and MapReduce content before implementation | unresolved | future onboarding | no learner evidence yet | unassigned | source not yet inspected in detail |
-| `COV-FUTURE-09A` | Lecture 9 Apache Spark Essentials, full deck | Inspect and map Spark essentials before implementation | unresolved | future onboarding | no learner evidence yet | unassigned | source not yet inspected in detail |
-| `COV-FUTURE-09B` | Lecture 9 Spark Programming Using Scala, full deck | Inspect and map Spark programming content before implementation | unresolved | future onboarding | no learner evidence yet | unassigned | source not yet inspected in detail |
-| `COV-FUTURE-10` | Lecture 10, full deck | Inspect and map MLlib content before implementation | unresolved | future onboarding | no learner evidence yet | unassigned | source not yet inspected in detail |
-| `COV-FUTURE-11` | Lecture 11, full deck | Inspect and map NoSQL and distributed storage content before implementation | unresolved | future onboarding | no learner evidence yet | unassigned | source not yet inspected in detail |
-| `COV-FUTURE-12` | Lecture 12, full deck | Inspect and map streaming and fast-data content before implementation | unresolved | future onboarding | no learner evidence yet | unassigned | source not yet inspected in detail |
+| COV-001 | materials/slides/Lecture1-Introduction to Big Data Analytics.pdf, pp. 7–44 | Start with the target | core | Lecture 1, What can a machine learn? | lessonContent.ts: learning-paradigms/targets | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-002 | materials/slides/Lecture1-Introduction to Big Data Analytics.pdf, pp. 7–44 | When there is no supplied label | core | Lecture 1, What can a machine learn? | lessonContent.ts: learning-paradigms/structure | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-003 | materials/slides/Lecture1-Introduction to Big Data Analytics.pdf, pp. 7–44 | Learning through consequences | core | Lecture 1, What can a machine learn? | lessonContent.ts: learning-paradigms/rewards | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-004 | materials/slides/Lecture1-Introduction to Big Data Analytics.pdf, pp. 7–44 | Apply the idea and transfer to a fresh case | core | Lecture 1, What can a machine learn? | CourseActivities.tsx: paradigms; final challenge | reviewed | New formative examples approved through the explicit deployment request on 2026-09-06 |
+| COV-005 | materials/slides/Lecture1-Introduction to Big Data Analytics.pdf, pp. 45–end; course outline pp. 2–3 | A sale and a sales report ask different things | core | Lecture 1, Choose a data architecture | lessonContent.ts: big-data-systems/workloads | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-006 | materials/slides/Lecture1-Introduction to Big Data Analytics.pdf, pp. 45–end; course outline pp. 2–3 | More data changes the bottleneck | core | Lecture 1, Choose a data architecture | lessonContent.ts: big-data-systems/scale | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-007 | materials/slides/Lecture1-Introduction to Big Data Analytics.pdf, pp. 45–end; course outline pp. 2–3 | Match the architecture to the decision | core | Lecture 1, Choose a data architecture | lessonContent.ts: big-data-systems/architectures | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-008 | materials/slides/Lecture1-Introduction to Big Data Analytics.pdf, pp. 45–end; course outline pp. 2–3 | Apply the idea and transfer to a fresh case | core | Lecture 1, Choose a data architecture | CourseActivities.tsx: systems; final challenge | reviewed | New formative examples approved through the explicit deployment request on 2026-09-06 |
+| COV-009 | materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pdf, pp. 3–29 | Inspect before you transform | core | Lecture 2, Make the data comparable | lessonContent.ts: clean-transform/inspect | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-010 | materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pdf, pp. 3–29 | Every cleaning choice makes an assumption | core | Lecture 2, Make the data comparable | lessonContent.ts: clean-transform/clean | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-011 | materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pdf, pp. 3–29 | Change the scale, not the underlying observation | core | Lecture 2, Make the data comparable | lessonContent.ts: clean-transform/scale-values | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-012 | materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pdf, pp. 3–29 | Apply the idea and transfer to a fresh case | core | Lecture 2, Make the data comparable | CourseActivities.tsx: normalization; final challenge | reviewed | New formative examples approved through the explicit deployment request on 2026-09-06 |
+| COV-013 | materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pdf, pp. 31–67 | A larger feature set can make learning harder | core | Lecture 2, Keep the useful directions | lessonContent.ts: pca/reduction | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-014 | materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pdf, pp. 31–67 | Which line loses the least information? | core | Lecture 2, Keep the useful directions | lessonContent.ts: pca/projection | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-015 | materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pdf, pp. 31–67 | Keep enough components for your purpose | core | Lecture 2, Keep the useful directions | lessonContent.ts: pca/components | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-016 | materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pdf, pp. 31–67 | Apply the idea and transfer to a fresh case | core | Lecture 2, Keep the useful directions | CourseActivities.tsx: pca; final challenge | reviewed | New formative examples approved through the explicit deployment request on 2026-09-06 |
+| COV-017 | materials/labs/Exercise2_data_exploration.ipynb, All notebook sections; materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pdf, pp. 7–16 | Start with the supplied data | core | Lecture 2, Lab · Explore the Chicago data | lessonContent.ts: exploration-lab/setup | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-018 | materials/labs/Exercise2_data_exploration.ipynb, All notebook sections; materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pdf, pp. 7–16 | Represent meaning, not just parser types | core | Lecture 2, Lab · Explore the Chicago data | lessonContent.ts: exploration-lab/features | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-019 | materials/labs/Exercise2_data_exploration.ipynb, All notebook sections; materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pdf, pp. 7–16 | Use a plot that can answer the question | core | Lecture 2, Lab · Explore the Chicago data | lessonContent.ts: exploration-lab/plots | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-020 | materials/labs/Exercise2_data_exploration.ipynb, All notebook sections; materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pdf, pp. 7–16 | Apply the idea and transfer to a fresh case | core | Lecture 2, Lab · Explore the Chicago data | CourseActivities.tsx: eda; final challenge | reviewed | New formative examples approved through the explicit deployment request on 2026-09-06 |
+| COV-021 | materials/slides/Lecture3-Clustering.pdf, pp. 1–20; pp. 55–57 | Similarity depends on representation | core | Lecture 3, Build clusters one step at a time | lessonContent.ts: kmeans/groups | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-022 | materials/slides/Lecture3-Clustering.pdf, pp. 1–20; pp. 55–57 | What exactly gets smaller? | core | Lecture 3, Build clusters one step at a time | lessonContent.ts: kmeans/objective | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-023 | materials/slides/Lecture3-Clustering.pdf, pp. 1–20; pp. 55–57 | Apply the idea and transfer to a fresh case | core | Lecture 3, Build clusters one step at a time | CourseActivities.tsx: kmeans; final challenge | reviewed | New formative examples approved through the explicit deployment request on 2026-09-06 |
+| COV-024 | materials/slides/Lecture3-Clustering.pdf, pp. 21–43 | Build a hierarchy of merges | core | Lecture 3, Beyond round clusters | lessonContent.ts: density-hierarchy/merge | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-025 | materials/slides/Lecture3-Clustering.pdf, pp. 21–43 | A cluster can follow dense neighborhoods | core | Lecture 3, Beyond round clusters | lessonContent.ts: density-hierarchy/density | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-026 | materials/slides/Lecture3-Clustering.pdf, pp. 21–43 | Different strengths, different failure modes | core | Lecture 3, Beyond round clusters | lessonContent.ts: density-hierarchy/limits | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-027 | materials/slides/Lecture3-Clustering.pdf, pp. 21–43 | Apply the idea and transfer to a fresh case | core | Lecture 3, Beyond round clusters | CourseActivities.tsx: dbscan; final challenge | reviewed | New formative examples approved through the explicit deployment request on 2026-09-06 |
+| COV-028 | materials/slides/Lecture3-Clustering.pdf, pp. 44–64 | First ask what evidence you have | core | Lecture 3, Are these clusters useful? | lessonContent.ts: cluster-validation/evidence | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-029 | materials/slides/Lecture3-Clustering.pdf, pp. 44–64 | Agreement is more than one kind of match | core | Lecture 3, Are these clusters useful? | lessonContent.ts: cluster-validation/external | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-030 | materials/slides/Lecture3-Clustering.pdf, pp. 44–64 | Compactness and separation need to be read together | core | Lecture 3, Are these clusters useful? | lessonContent.ts: cluster-validation/internal | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-031 | materials/slides/Lecture3-Clustering.pdf, pp. 44–64 | Apply the idea and transfer to a fresh case | core | Lecture 3, Are these clusters useful? | CourseActivities.tsx: silhouette; final challenge | reviewed | New formative examples approved through the explicit deployment request on 2026-09-06 |
+| COV-032 | materials/labs/Exercise3_clustering.ipynb, Preprocessing, aggregation, and all six clustering sections | The map is not the space being clustered | core | Lecture 3, Lab · Compare clustering methods | lessonContent.ts: clustering-lab/geo | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-033 | materials/labs/Exercise3_clustering.ipynb, Preprocessing, aggregation, and all six clustering sections | Change one choice at a time | core | Lecture 3, Lab · Compare clustering methods | lessonContent.ts: clustering-lab/methods | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-034 | materials/labs/Exercise3_clustering.ipynb, Preprocessing, aggregation, and all six clustering sections | Make a comparison someone else can inspect | core | Lecture 3, Lab · Compare clustering methods | lessonContent.ts: clustering-lab/record | reviewed | Instructor approved the current preview for deployment on 2026-09-06 |
+| COV-035 | materials/labs/Exercise3_clustering.ipynb, Preprocessing, aggregation, and all six clustering sections | Apply the idea and transfer to a fresh case | core | Lecture 3, Lab · Compare clustering methods | CourseActivities.tsx: lab-record; final challenge | reviewed | New formative examples approved through the explicit deployment request on 2026-09-06 |
+| COV-CONTEXT | Lecture 1 pp. 2–6; image-only and historical illustration slides across supplied PDFs | Administrative scope and supporting historical illustrations beyond the implemented learning path | supporting | Excluded from first web release | Omitted from learner interface and production bundle | excluded | Instructor authorized deployment of the current preview on 2026-09-06 |
 
-## Risks and unresolved decisions
+## Interpretation notes for instructor review
+- Lecture 2 p. 55 reverses eigenvalue/eigenvector labels. The preview uses Ax = lambda x with x the vector and lambda the scalar.
+- Lecture 2 p. 22 rounds bin means; preview arithmetic uses exact means 9, 22.75, 29.25.
+- Lecture 3 silhouette values can be negative; the preview uses the full [-1,1] range.
+- DBSCAN convention is inclusive MinPts including the observation; border ties use first-reachable assignment rather than the lecture pseudocode's closest core.
+- Self-supervised training is distinguished from zero-shot application.
+- Chicago administrative categories are not asserted to form a strict geographic hierarchy.
+- Source PDFs were text-extracted fully and three representative pages visually inspected. Image-only regions and fine mathematical figures have not received a complete visual audit.
 
-- Publication rights for logos, third-party diagrams, photographs, and cited source material are not confirmed, so the implementation uses new course-neutral visuals only.
-- Some equation symbols in Lecture 2 do not extract correctly. The numeric examples and visible rendered slides were used where the meaning was clear; formal PCA equations require instructor review.
-- Speaker notes are sparse and sometimes contain authoring reminders rather than teaching explanation.
-- The full course sequence is a provisional map until Lectures 3 to 12 are inspected in detail.
-- Course code, exact term, prerequisites, contact information, and visual-direction approval remain open.
+## Data availability
+The Chicago CSV and preprocessed GeoNames files referenced by the labs were not supplied. Lab guidance is usable; full Python experiments require those data and Jupyter. Browser plots use fixed synthetic data.
 
-## Pilot decision
-
-- First vertical slice: `choose-learning-signal`, based on Lecture 1 slides 7 to 44
-- Why it is representative: it combines a difficult classification decision, a plausible misconception, several output structures, and an interaction that can preserve feedback and transfer to a fresh case
-- Instructor approval: implementation explicitly requested; factual and pedagogical review pending
-
-## Lifecycle evidence
-
-- Template setup: clean copy created from `aiml-sdu/ml-big-data`; previous ad hoc project preserved in `ml-big-data-learning-legacy-20260825`
-- Material inventory: 13 decks and 1,005 slides inventoried; Lectures 1 and 2 extracted and rendered
-- Coverage ledger and scope decisions: drafted; instructor review pending
-- Pilot implementation and browser QA: in progress
-- Instructor factual review: pending
-- Representative learner observation: pending
-- Release record: see `course/RELEASE.md`
+## Review state
+All nine rounds are implemented and approved for this release through the instructor's explicit deployment request. Representative learner observation was not run and is recorded as a limitation rather than claimed evidence. Supporting source illustrations are excluded from this release.
 

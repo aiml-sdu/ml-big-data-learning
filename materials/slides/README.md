@@ -1,10 +1,5 @@
-# Local lecture sources
+# Slides
 
-PowerPoint lecture decks are kept in this directory for local authoring and source checks. They are ignored by Git so the public learning platform does not republish the original files.
+Add lecture decks or exports here. Prefer PDF for stable page references; keep PPTX when animations, speaker notes, or editable figures matter.
 
-The first implementation uses:
-
-- `Lecture1-Introduction to Big Data Analytics.pptx`
-- `Lecture2-Data Preprocessing and Feature Engineering.pptx`
-
-Source references in module metadata point to these repository-relative paths and exact slide ranges.
+Suggested names: `week-01-introduction.pdf`, `topic-04-search.pptx`.

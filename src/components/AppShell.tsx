@@ -1,12 +1,15 @@
 import { BookOpen, CheckCircle2, Home, Menu, X } from 'lucide-react';
-import { useState, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { Link, NavLink, Outlet, ScrollRestoration } from 'react-router-dom';
 import { COURSE } from '@/course/course.config';
 import { COURSE_MODULES } from '@/course/modules';
 import { useCourseProgress } from '@/hooks/useCourseProgress';
-import { ThemeToggle } from './ThemeToggle';
+import { useCourseTools } from '@/course/useCourseTools';
+
 
 export function AppShell() {
+  useCourseTools();
+  useEffect(() => { document.documentElement.dataset.theme = 'light'; }, []);
   const [menuOpen, setMenuOpen] = useState(false);
   const { completedSlugs } = useCourseProgress();
   const theme = {
@@ -43,7 +46,6 @@ export function AppShell() {
         </Link>
         <div className="topbar-actions">
           <div className="topbar-meta"><span>{COURSE.institution}</span><span>{COURSE.term}</span></div>
-          <ThemeToggle />
           <button className="mobile-menu" aria-expanded={menuOpen} aria-label="Toggle course navigation" onClick={() => setMenuOpen((value) => !value)}>
             {menuOpen ? <X /> : <Menu />}
           </button>
@@ -56,12 +58,12 @@ export function AppShell() {
             <NavLink className={({ isActive }) => `nav-item nav-home ${isActive ? 'is-active' : ''}`} to="/" end onClick={() => setMenuOpen(false)}>
               <Home size={17} /> Course overview
             </NavLink>
-            <p className="nav-label">Course path</p>
+            <p className="nav-label">Lectures</p>
             {COURSE_MODULES.map((module) => (
               <NavLink
                 className={({ isActive }) => `nav-item ${isActive ? 'is-active' : ''}`}
                 key={module.slug}
-                to={`/modules/${module.slug}`}
+                to={`/lectures/${module.slug}`}
                 onClick={() => setMenuOpen(false)}
               >
                 <span className="nav-number">{String(module.number).padStart(2, '0')}</span>

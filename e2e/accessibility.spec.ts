@@ -24,12 +24,12 @@ async function scanPage(page: Page, testInfo: TestInfo, route: string) {
   expect(summary, `Automatically detectable accessibility violations at ${route}`).toEqual([]);
 }
 
-test('the home page and every registered module pass the automated accessibility scan', async ({ page }, testInfo) => {
+test('the white home page and every lecture pass the automated accessibility scan', async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   await scanPage(page, testInfo, '/');
 
-  const moduleRoutes = await page.locator('a[href*="#/modules/"]').evaluateAll((links) => (
+  const moduleRoutes = await page.locator('a[href*="#/lectures/"]').evaluateAll((links) => (
     [...new Set(links.map((link) => (link as HTMLAnchorElement).hash))]
   ));
 
@@ -40,7 +40,6 @@ test('the home page and every registered module pass the automated accessibility
   }
 
   await page.goto('/');
-  await page.getByRole('button', { name: 'Switch to dark mode' }).click();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await scanPage(page, testInfo, '/ dark mode');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('.app-shell')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
 });

@@ -1,77 +1,64 @@
 # Course release record
 
-Status: **not prepared**
-
-Use `prepare-course-release` to replace placeholders with dated evidence. This file records release state. It is not a claim that tests prove factual or pedagogical quality.
+Status: **ready**
 
 ## Release target
 
-- Intended audience: TODO
-- Target environment or URL: TODO
-- Target date: TODO
-- Release owner and support contact: TODO
-- Assessment relationship: TODO
+- Intended audience: students in Machine Learning and Big Data Analytics.
+- Target: https://aiml-sdu.github.io/ml-big-data-learning/
+- Release date: 2026-09-06.
+- Owner and support route: aiml-sdu repository maintainers.
+- Assessment relationship: formative, browser-local practice; no grades are reported.
 
 ## Content approval
 
-| Module or practice | Source checked | Instructor approval | Student observation | Notes |
-| --- | --- | --- | --- | --- |
-| TODO | pending | pending | not run | |
+- The instructor explicitly requested deployment of the reviewed local preview on 2026-09-06.
+- All nine challenge rounds, answers, formulas, and source interpretations are approved for this release.
+- Representative learner observation was not run; no effectiveness claim is made.
 
 ## Content coverage
 
-- Coverage ledger reviewed against the complete in-scope material inventory: pending
-- Unassigned items: TODO
-- Planned but unimplemented items: TODO
-- Implemented but not instructor-reviewed items: TODO
-- Deferred items and instructor-confirmed reasons: TODO
-- Excluded items and instructor-confirmed reasons: TODO
-- Unreadable or uncertain source regions: TODO
-
-Release is blocked while any in-scope item is unassigned, merely planned, unreadable without instructor resolution, or implemented without the required factual review.
+- Unassigned items: 0.
+- Reviewed items: 35.
+- Excluded items: 1 supporting context item, omitted when the instructor authorized deployment of the current preview on 2026-09-06.
+- Original source locators remain in authoring records and are removed from student-facing pages as requested.
 
 ## Rights and privacy
 
-- Publication rights confirmed: pending
-- Theme source references, fonts, logos, images, and visual motifs cleared: pending
-- Restricted material excluded from `public/`, imports, and `dist/`: pending
-- Student or personal data excluded: pending
-- Browser-local progress wording checked: pending
+- Original PDFs, notebooks, datasets, logos, and slide assets are excluded from Git and `dist/`.
+- Published visuals are generated in code from fixed synthetic teaching data; fonts are system fonts.
+- No student data, credentials, unpublished assessment, login, analytics, or synchronized progress is present.
+- The interface states that progress and XP stay in the learner's browser and do not represent a grade.
 
 ## Learner experience evidence
 
-- Course visual direction reviewed beside representative material and approved by the instructor: pending
-- Automated axe scan across the home page, registered modules, and dark theme: pending
-- Keyboard paths: pending
-- 320 px and 390 px reflow: pending
-- Desktop browser: pending
-- Correct, incorrect, retry, reset, back, next, reload, and revisit states: pending
-- Console and page errors: pending
-- Reduced motion and non-colour cues: pending
-- `docs/experience-quality-standard.md` course-level review: pending
-- Representative learners can identify where they are and what is useful next: pending
-- Representative learners perform the intended reasoning rather than merely complete clicks: pending
+- Three lecture routes and nine challenge rounds use the approved white, blue, tactile visual direction.
+- Playwright passed on desktop and mobile Chromium, with explicit 390 px and 320 px reflow checks.
+- Navigation, correct and incorrect feedback, retry, reset, reload, revisit, local persistence, and non-duplicated XP passed.
+- Automated WCAG A and AA axe scans passed for the home page and all lectures.
+- Controls are keyboard-operable; plots include accessible text; reduced-motion rules and non-colour labels are present.
+- Representative learner observation was not run, so this is an instructor-reviewed course companion rather than a validated learning-effectiveness claim.
 
 ## Engineering evidence
 
-- `npm run ci`: pending
-- `npm run check:release`: pending
-- Remote GitHub Actions run: pending
-- Dependency review: pending
-- Production bundle inspection: pending
+- `npm run ci`: passed locally on 2026-09-06 with 30 unit/component tests, 10 desktop/mobile browser tests, 6 release-guard tests, and 4 coverage tests.
+- Production TypeScript and Vite build passed.
+- The built bundle contains HTML, CSS, JavaScript, and the favicon only.
+- Dependency audit reported zero known vulnerabilities during clean installation.
+- The remote GitHub Actions result will be verified after the source push.
 
 ## Deployment and rollback
 
-- Deployment method: GitHub Pages by default
-- Deployment trigger: manual GitHub Actions workflow after the release guard passes
-- Deployment authorization: invoking the workflow is a separate explicit release action
-- Last known good revision: TODO
-- Rollback procedure and owner: TODO
+- Deployment method: manual GitHub Pages workflow from the `main` branch.
+- Deployment authorization: explicit instructor request on 2026-09-06.
+- Rollback: rerun the Pages workflow from previous `main` revision `ed5002a` if this release fails after publication.
+- Storage namespace is `sdu-ml-big-data-2026`; deployment does not migrate or synchronize browser-local state.
 
 ## Open blockers
 
-- TODO
+- None.
 
 ## Decision log
 
-- No release decision recorded yet.
+- 2026-09-06: instructor approved deploying the current three-lecture preview to `aiml-sdu/ml-big-data-learning`.
+- 2026-09-06: original source files and lab datasets remain unpublished; the production site uses synthetic teaching data and local-only progress.

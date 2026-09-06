@@ -21,7 +21,7 @@ export function getJourneyPosition(index: number): JourneyPosition {
 
 export function CourseJourney({ modules, completedSlugs }: CourseJourneyProps) {
   if (modules.length === 0) {
-    return <p className="journey-empty">No modules are ready yet.</p>;
+    return <p className="journey-empty">No lectures are ready yet.</p>;
   }
 
   const points = modules.map((module, index) => ({
@@ -64,7 +64,7 @@ export function CourseJourney({ modules, completedSlugs }: CourseJourneyProps) {
         {points.map(({ module, position, y }, index) => {
           const complete = completedSlugs.includes(module.slug);
           const labelSide = index % 2 === 0 ? 'right' : 'left';
-          const moduleLabel = module.kind === 'practice' ? 'Practice' : 'Module';
+          const moduleLabel = module.kind === 'practice' ? 'Practice' : 'Lecture';
 
           return (
             <li
@@ -72,7 +72,7 @@ export function CourseJourney({ modules, completedSlugs }: CourseJourneyProps) {
               key={module.slug}
               style={{ top: y - NODE_SIZE / 2 }}
             >
-              <Link className="journey-link" to={`/modules/${module.slug}`}>
+              <Link className="journey-link" to={`/lectures/${module.slug}`}>
                 <span className={`journey-node ${complete ? 'is-complete' : ''}`}>
                   {complete ? <Check size={26} strokeWidth={3} /> : String(module.number).padStart(2, '0')}
                 </span>

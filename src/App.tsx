@@ -10,13 +10,13 @@ const router = createHashRouter([
     children: [
       { index: true, element: <HomePage /> },
       ...COURSE_MODULES.map((module, index) => ({
-        path: `modules/${module.slug}`,
+        path: `lectures/${module.slug}`,
         element: (
           <ModuleSequenceProvider
             previous={COURSE_MODULES[index - 1]}
             next={COURSE_MODULES[index + 1]}
           >
-            <module.Component module={module} />
+            <module.Component key={module.slug} module={module} />
           </ModuleSequenceProvider>
         ),
       })),

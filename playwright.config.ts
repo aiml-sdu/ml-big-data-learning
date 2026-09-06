@@ -9,7 +9,6 @@ export default defineConfig({
   reporter: process.env.CI ? [['line'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: 'http://127.0.0.1:4173',
-    channel: process.env.PLAYWRIGHT_CHANNEL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },

@@ -1,56 +1,57 @@
 import type { CourseConfig } from './types';
 
+/**
+ * This is the first code file an instructor or agent should customize.
+ * Keep course content in modules; keep course-wide identity here.
+ */
 export const COURSE: CourseConfig = {
   institution: 'University of Southern Denmark',
-  code: 'ML-BDA',
+  code: 'ML / BIG DATA',
   title: 'Machine Learning and Big Data Analytics',
-  shortTitle: 'ML + Big Data',
-  term: '2026',
+  shortTitle: 'ML & Big Data',
+  term: 'Lectures 01–03',
   description:
-    'Build intuition by making a prediction, watching the system respond, and testing the same rule on a fresh case.',
+    'Connect the ideas in your lectures to the decisions you make with data. Predict, experiment, and work through the labs at your own pace.',
+  contact: 'Serkan Ayvaz · Maximilian von Zastrow',
+  // Change this when creating a course. It keeps browser progress separate from other courses.
   storageNamespace: 'sdu-ml-big-data-2026',
   theme: {
-    primary: '#172a3a',
-    accent: '#1f6feb',
+    // This neutral starter must be replaced during onboarding with roles derived from representative material.
+    primary: '#112d4e',
+    accent: '#0067b9',
     light: {
       background: '#ffffff',
       surface: '#ffffff',
-      surfaceSoft: '#edf1f3',
-      surfaceMuted: '#e8ebed',
-      text: '#101820',
-      bodyCopy: '#43515d',
-      mutedText: '#5c6974',
-      line: '#d7dee3',
-      accentText: '#1454b8',
+      surfaceSoft: '#edf3fa',
+      surfaceMuted: '#e7eff8',
+      text: '#1d2635',
+      bodyCopy: '#505968',
+      mutedText: '#596373',
+      line: '#d2deeb',
+      accentText: '#005aa3',
     },
     dark: {
-      background: '#0b141c',
-      surface: '#15222d',
-      surfaceSoft: '#101b24',
-      surfaceMuted: '#121e28',
-      text: '#f4f7f9',
-      bodyCopy: '#bfccd5',
-      mutedText: '#aab8c2',
-      line: '#2b3c49',
-      accentText: '#7eb0ff',
+      background: '#0c1321',
+      surface: '#182238',
+      surfaceSoft: '#111a2b',
+      surfaceMuted: '#121c2e',
+      text: '#eef2fb',
+      bodyCopy: '#b7c0d1',
+      mutedText: '#a8b2c5',
+      line: '#2c3850',
+      accentText: '#7bc3ff',
     },
     typography: {
-      body: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      heading: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      body: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      heading: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     },
     geometry: 'balanced',
-    rationale:
-      'Representative slides use strong dark type, generous white space, and simple blue quantitative marks. The platform adapts those cues into an accessible technical interface without reproducing slide layouts or assets.',
+    rationale: 'White teaching surfaces from Lecture 1 page 1 and blue concept emphasis from Lecture 3 page 35. System fonts and labelled plots keep technical material readable.',
     sourceRefs: [
       {
-        label: 'Lecture 1 visual direction',
-        path: 'materials/slides/Lecture1-Introduction to Big Data Analytics.pptx',
-        locator: 'slides 1 and 64',
-      },
-      {
-        label: 'Lecture 2 visual direction',
-        path: 'materials/slides/Lecture2-Data Preprocessing and Feature Engineering.pptx',
-        locator: 'slides 14, 31, and 59',
+        label: 'Course visual direction',
+        path: 'materials/course-info.md',
+        locator: 'Course visual direction',
       },
     ],
   },

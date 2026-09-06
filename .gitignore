@@ -13,7 +13,6 @@ CLAUDE.local.md
 # Local reference implementation; not part of the distributable template.
 /example/
 
-# Instructor-owned slide decks stay local. Source locators remain in the project,
-# but the original PowerPoint files are never published with the site.
-/materials/slides/*.pptx
-/materials/slides/*.ppt
+# Instructor-owned source material is used locally and never published.
+/materials/slides/*.pdf
+/materials/labs/*.ipynb

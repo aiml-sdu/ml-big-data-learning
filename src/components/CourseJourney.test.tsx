@@ -22,7 +22,7 @@ describe('CourseJourney', () => {
     for (const module of COURSE_MODULES) {
       expect(screen.getByRole('link', { name: new RegExp(module.title) })).toHaveAttribute(
         'href',
-        `/modules/${module.slug}`,
+        `/lectures/${module.slug}`,
       );
     }
     expect(container.querySelectorAll('.journey-connector')).toHaveLength(COURSE_MODULES.length - 1);
@@ -35,6 +35,6 @@ describe('CourseJourney', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByText('No modules are ready yet.')).toBeInTheDocument();
+    expect(screen.getByText('No lectures are ready yet.')).toBeInTheDocument();
   });
 });

@@ -1,60 +1,20 @@
-import { ArrowRight, BookOpenCheck, Clock3, Layers3, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpenCheck, FlaskConical, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CourseJourney } from '@/components/CourseJourney';
-import { COURSE } from '@/course/course.config';
 import { COURSE_MODULES } from '@/course/modules';
 import { useCourseProgress } from '@/hooks/useCourseProgress';
 
-export default function HomePage() {
-  const { completedSlugs } = useCourseProgress();
-  const completed = COURSE_MODULES.filter((module) => completedSlugs.includes(module.slug)).length;
-  const percentage = COURSE_MODULES.length === 0 ? 0 : Math.round((completed / COURSE_MODULES.length) * 100);
-
-  return (
-    <div className="home-page">
-      <section className="home-hero">
-        <div className="hero-copy">
-          <p className="eyebrow"><Sparkles size={16} /> Interactive course companion</p>
-          <h1>Build intuition for<br /><em>machine learning and big data.</em></h1>
-          <p className="hero-lead">{COURSE.description}</p>
-          <div className="hero-actions">
-            {COURSE_MODULES[0] && (
-              <Link className="button button-primary" to={`/modules/${COURSE_MODULES[0].slug}`}>
-                Start learning <ArrowRight size={16} />
-              </Link>
-            )}
-            <a
-              className="button button-secondary"
-              href="#modules"
-              onClick={(event) => {
-                event.preventDefault();
-                document.getElementById('modules')?.scrollIntoView();
-              }}
-            >
-              Browse modules
-            </a>
-          </div>
-        </div>
-        <aside className="course-snapshot" aria-label="Course overview">
-          <div className="snapshot-top"><span>{COURSE.code}</span><span>{COURSE.term}</span></div>
-          <h2>{COURSE.title}</h2>
-          <div className="snapshot-stats">
-            <div><Layers3 size={20} /><strong>{COURSE_MODULES.length}</strong><span>module{COURSE_MODULES.length === 1 ? '' : 's'}</span></div>
-            <div><Clock3 size={20} /><strong>{COURSE_MODULES.reduce((sum, item) => sum + item.estimatedMinutes, 0)}</strong><span>minutes</span></div>
-            <div><BookOpenCheck size={20} /><strong>{completed}</strong><span>completed</span></div>
-          </div>
-          <div className="progress-label"><span>Your progress</span><strong>{percentage}%</strong></div>
-          <div className="progress-track"><span style={{ width: `${percentage}%` }} /></div>
-        </aside>
-      </section>
-
-      <section className="module-catalog journey-section" id="modules">
-        <div className="section-heading">
-          <div><p className="eyebrow">Your course journey</p><h2>Follow the path</h2></div>
-          <p>Lectures 1 and 2 are rebuilt as short investigations: make a choice, inspect the result, and transfer the rule.</p>
-        </div>
-        <CourseJourney modules={COURSE_MODULES} completedSlugs={completedSlugs} />
-      </section>
-    </div>
-  );
+export default function HomePage(){
+  const {completedSlugs}=useCourseProgress();
+  const completed=COURSE_MODULES.filter(l=>completedSlugs.includes(l.slug)).length;
+  const next=COURSE_MODULES.find(l=>!completedSlugs.includes(l.slug))??COURSE_MODULES[0];
+  return <div className="home-page">
+    <section className="course-welcome">
+      <div><p className="eyebrow">Machine Learning and Big Data Analytics</p><h1>Your learning journey</h1><p>Experiment with the ideas. Test your reasoning. Build confidence for the labs.</p></div>
+      <Link className="button button-primary" to={`/lectures/${next.slug}`}>{completed===3?'Review a lecture':completed>0?'Continue learning':'Start lecture 1'}<ArrowRight size={18}/></Link>
+    </section>
+    <div className="journey-strip"><span><BookOpenCheck size={19}/><strong>3</strong> lectures</span><span><FlaskConical size={19}/><strong>9</strong> challenge rounds</span><span><Trophy size={19}/><strong>{completed} / 3</strong> lectures completed</span></div>
+    <section className="module-catalog journey-section" id="lectures"><div className="section-heading"><div><p className="eyebrow">Choose your next challenge</p><h2>Follow the lecture path</h2></div><p>Explore freely. Each round ends with a fresh problem to solve.</p></div><CourseJourney modules={COURSE_MODULES} completedSlugs={completedSlugs}/></section>
+    <div className="course-footnote"><strong>Learn at your own pace.</strong> Quizzes include explanations and retries. Your progress stays in this browser.</div>
+  </div>;
 }
