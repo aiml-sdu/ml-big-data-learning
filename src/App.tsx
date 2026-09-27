@@ -1,6 +1,6 @@
 import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { BrainCircuit, Check, ChevronRight, Database, Home, Layers3, LineChart, Lock, Menu, Play, Sparkles, X } from 'lucide-react';
-import { AmbiguityGame, BigDataModel, DBSCANTuner, DendrogramCut, DirtyDataLab, FeatureTransformLab, FitLineGame, GradientDescentLab, KMeansLab, LossVisualizer, OLTPOLAPGame, OutlierInfluenceLab, ParallelismLab, PCAExplorer, PipelineChallenge, PracticeQuiz, RegressionOutlierLab, ScalingGeometry, SilhouetteExplorer, SolverComparison, TutorialLab } from './LearningActivities';
+import { AmbiguityGame, BigDataModel, DBSCANTuner, DecisionTreeSplitLab, DendrogramCut, DirtyDataLab, FeatureTransformLab, FitLineGame, GradientDescentLab, KMeansLab, KNNClassifierLab, LossVisualizer, NaiveBayesLab, OLTPOLAPGame, OutlierInfluenceLab, ParallelismLab, PCAExplorer, PipelineChallenge, PracticeQuiz, RegressionOutlierLab, ScalingGeometry, SilhouetteExplorer, SolverComparison, SVMKernelLab, TrainTestSimulator, TutorialLab } from './LearningActivities';
 
 type Unit = { id: string; title: string; eyebrow: string };
 type Lecture = { id: string; number: string; title: string; color: string; icon: typeof Database; units: Unit[]; locked?: boolean; description?: string };
@@ -54,7 +54,18 @@ const lectures: Lecture[] = [
       { id: 'practice-4', title: 'Lecture practice', eyebrow: 'Independent check' },
     ],
   },
-  { id: 'classification', number: '05', title: 'Fundamental Classification Algorithms', color: '#ff8f70', icon: BrainCircuit, units: [], locked: true, description: 'Core methods for assigning observations to discrete classes' },
+  {
+    id: 'classification', number: '05', title: 'Fundamental Classification Algorithms', color: '#ff8f70', icon: BrainCircuit, description: 'KNN, decision trees, Naive Bayes, and support vector machines',
+    units: [
+      { id: 'classification-workflow', title: 'Train, test, then generalize', eyebrow: 'Workflow simulator' },
+      { id: 'knn-classifier', title: 'Let nearby records vote', eyebrow: 'KNN game' },
+      { id: 'tree-split', title: 'Find a purer decision split', eyebrow: 'Tree induction lab' },
+      { id: 'naive-bayes', title: 'Combine probabilistic evidence', eyebrow: 'Probability lab' },
+      { id: 'svm-kernel', title: 'Shape margins and kernels', eyebrow: 'SVM explorer' },
+      { id: 'lab-5', title: 'Compare classifier surfaces', eyebrow: 'Tutorial lab' },
+      { id: 'practice-5', title: 'Lecture practice', eyebrow: 'Independent check' },
+    ],
+  },
   { id: 'neural-networks', number: '06', title: 'Artificial Neural Networks', color: '#9b8cff', icon: BrainCircuit, units: [], locked: true, description: 'Neurons, multilayer networks, and learning by backpropagation' },
   { id: 'ensembles', number: '07', title: 'Ensemble Methods & Model Evaluation', color: '#49b9a2', icon: Layers3, units: [], locked: true, description: 'Combine models and evaluate generalization reliably' },
   { id: 'hadoop', number: '08', title: 'Hadoop Fundamentals & MapReduce', color: '#edaa43', icon: Database, units: [], locked: true, description: 'Distributed storage and batch computation across clusters' },
@@ -100,6 +111,13 @@ const unitCopy: Record<string, { lead: string; key: string }> = {
   gradient: { lead: 'Gradient descent repeatedly measures the local slope of the loss and steps in the opposite direction.', key: 'The learning rate controls step size: too small wastes iterations; too large can overshoot the minimum.' },
   'lab-4': { lead: 'Follow the Week 4 notebook from synthetic data to SciPy, statsmodels, a NumPy closed form, and a trainable PyTorch model.', key: 'Different implementations should recover the same linear relationship when they optimize the same objective.' },
   'practice-4': { lead: 'Reason from the geometry of a line, its residuals, and the optimization process.', key: 'A fitted model, its objective, and its optimizer are different parts of the same learning system.' },
+  'classification-workflow': { lead: 'Classification learns a mapping from features to discrete labels, then applies that mapping to records the model has never seen.', key: 'Training data builds the model. An untouched test set measures how well the learned rule generalizes.' },
+  'knn-classifier': { lead: 'KNN classifies a new record from the labels of nearby training records, so distance, scale, and the choice of k define its behavior.', key: 'Small k follows local detail; large k smooths the decision boundary and can wash out small class regions.' },
+  'tree-split': { lead: 'Decision trees recursively split records into increasingly homogeneous groups using simple tests on feature values.', key: 'A useful split reduces weighted impurity. Gini and entropy quantify how mixed each candidate child node remains.' },
+  'naive-bayes': { lead: 'Naive Bayes combines a prior class probability with the likelihood of each observed feature under that class.', key: 'Conditional independence turns a difficult joint probability into a product of manageable feature probabilities.' },
+  'svm-kernel': { lead: 'Support vector machines choose a separating boundary with a wide margin, while kernels expand the shapes that boundary can express.', key: 'C balances margin width against violations; RBF gamma controls how local each support vector’s influence becomes.' },
+  'lab-5': { lead: 'Use the Week 5 notebook to compare how classification algorithms carve up linear, moon-shaped, and circular datasets.', key: 'A decision surface makes model assumptions visible, while held-out accuracy shows whether that shape generalizes.' },
+  'practice-5': { lead: 'Retrieve the main assumptions and failure modes of KNN, decision trees, Naive Bayes, and SVMs without visual scaffolding.', key: 'Classifier choice depends on geometry, probability assumptions, complexity, and the evidence available for generalization.' },
 };
 
 function ParadigmGame() {
@@ -150,6 +168,7 @@ function Activity({ id }: { id: string }): ReactNode {
     'dirty-data': <DirtyDataLab />, outliers: <OutlierInfluenceLab />, scaling: <ScalingGeometry />, 'feature-shape': <FeatureTransformLab />, pca: <PCAExplorer />, 'lab-2': <TutorialLab lecture={2} />, 'practice-2': <PracticeQuiz id="practice-2" />,
     ambiguity: <AmbiguityGame />, kmeans: <KMeansLab />, hierarchical: <DendrogramCut />, dbscan: <DBSCANTuner />, validation: <SilhouetteExplorer />, 'lab-3': <TutorialLab lecture={3} />, 'practice-3': <PracticeQuiz id="practice-3" />,
     'fit-line': <FitLineGame />, loss: <LossVisualizer />, 'outlier-leverage': <RegressionOutlierLab />, 'normal-equation': <SolverComparison />, gradient: <GradientDescentLab />, 'lab-4': <TutorialLab lecture={4} />, 'practice-4': <PracticeQuiz id="practice-4" />,
+    'classification-workflow': <TrainTestSimulator />, 'knn-classifier': <KNNClassifierLab />, 'tree-split': <DecisionTreeSplitLab />, 'naive-bayes': <NaiveBayesLab />, 'svm-kernel': <SVMKernelLab />, 'lab-5': <TutorialLab lecture={5} />, 'practice-5': <PracticeQuiz id="practice-5" />,
   };
   return activities[id];
 }
@@ -166,7 +185,7 @@ function WelcomePage({ onOpenLecture }: { onOpenLecture: (lecture: Lecture) => v
       <span className="welcome-kicker">Syddansk Universitet · Master course</span>
       <h1>ML &amp; Big Data Course</h1>
       <p>Learn the intuition first, experiment with interactive models, then consolidate each lecture through a guided lab and independent review.</p>
-      <div className="welcome-stats"><span><b>12</b> lectures planned</span><span><b>4</b> available now</span><span><b>28</b> activities and labs</span></div>
+      <div className="welcome-stats"><span><b>12</b> lectures planned</span><span><b>5</b> available now</span><span><b>35</b> activities and labs</span></div>
       <button className="welcome-start" onClick={() => onOpenLecture(lectures[0])}><Play /> Start Lecture 1</button>
     </section>
 
@@ -221,7 +240,7 @@ export default function App() {
 
       <aside className={`sidebar ${navOpen ? 'open' : ''}`}>
         <button className="close-nav" aria-label="Close course navigation" onClick={() => setNavOpen(false)}><X /></button>
-        <div className="sidebar-heading"><span>Course map</span><small>4 of 12 available</small></div>
+        <div className="sidebar-heading"><span>Course map</span><small>5 of 12 available</small></div>
         <nav>
           <button className={`welcome-nav ${view === 'welcome' ? 'current' : ''}`} onClick={showWelcome}><Home /><span>Welcome</span></button>
           {lectures.map((item) => {

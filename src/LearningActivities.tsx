@@ -215,6 +215,166 @@ export function SolverComparison(){const [rows,setRows]=useState(1000); const [f
 function gradientStep(slope:number,intercept:number,rate:number){let ds=0,di=0; for(const [x,y] of regressionPoints){const err=predict(x,slope,intercept)-y; ds+=2*err*x/regressionPoints.length; di+=2*err/regressionPoints.length;} return {slope:slope-rate*ds/100,intercept:intercept-rate*di};}
 export function GradientDescentLab(){const [rate,setRate]=useState(.3); const [state,setState]=useState({slope:.05,intercept:8,steps:0}); const history=useMemo(()=>{let s={slope:.05,intercept:8}; const h=[{...s,error:mse(s.slope,s.intercept)}]; for(let i=0;i<24;i++){s=gradientStep(s.slope,s.intercept,rate);h.push({...s,error:mse(s.slope,s.intercept)});}return h;},[rate]); const run=()=>{const next=history[Math.min(24,state.steps+1)];setState({slope:next.slope,intercept:next.intercept,steps:Math.min(24,state.steps+1)});}; const maxErr=Math.max(...history.map(h=>h.error)); return <section className="game-shell"><div className="activity-kicker">Optimization lab</div><h2>Choose a step size that learns steadily</h2><p className="activity-prompt">Gradient descent follows the local downhill direction. Too small crawls; too large can overshoot.</p><div className="viz-grid"><svg className="plot loss-chart" viewBox="0 0 100 100"><polyline points={history.map((h,i)=>`${8+i*3.5},${90-h.error/maxErr*72}`).join(' ')} fill="none" stroke="#6ea8ff" strokeWidth="2"/><circle cx={8+state.steps*3.5} cy={90-history[state.steps].error/maxErr*72} r="4" fill="#ffc86b"/><text x="8" y="97">step 0</text><text x="76" y="97">step 24</text></svg><div className="control-panel"><Range label="Learning rate" value={rate} min={.05} max={1.2} step={.05} onChange={(value)=>{setRate(value);setState({slope:.05,intercept:8,steps:0});}}/><div className="metric-pair"><div><small>Step</small><b>{state.steps}</b></div><div><small>MSE</small><b>{mse(state.slope,state.intercept).toFixed(0)}</b></div></div><button className="primary-button inline" onClick={run} disabled={state.steps===24}>Take one gradient step <ChevronRight/></button><button className="text-button" onClick={()=>setState({slope:.05,intercept:8,steps:0})}><RotateCcw/> Restart</button></div></div></section>;}
 
+const classificationPoints = [
+  [14, 74, 0], [20, 62, 0], [26, 79, 0], [31, 57, 0], [37, 70, 0], [43, 50, 0],
+  [57, 45, 1], [62, 32, 1], [68, 49, 1], [74, 24, 1], [80, 40, 1], [87, 17, 1],
+] as const;
+
+export function TrainTestSimulator() {
+  const [trainPercent, setTrainPercent] = useState(70);
+  const [trained, setTrained] = useState(false);
+  const trainCount = Math.round(classificationPoints.length * trainPercent / 100);
+  return <section className="game-shell">
+    <div className="activity-kicker">Classification workflow</div>
+    <h2>Keep the final check outside training</h2>
+    <p className="activity-prompt">Change the split, then fit the illustrative boundary. Test labels remain hidden until the model has been fixed.</p>
+    <div className="viz-grid">
+      <svg className="plot classification-plot" viewBox="0 0 100 100" role="img" aria-label={`${trainCount} training records and ${classificationPoints.length-trainCount} test records`}>
+        {trained && <><path className="class-region-a" d="M0 0H100V18L18 100H0Z"/><path className="class-boundary" d="M100 18L18 100"/></>}
+        {classificationPoints.map(([x,y,c],i) => {
+          const training = i < trainCount;
+          return <g key={i}><circle cx={x} cy={y} r="4.2" fill={training ? palette[c] : '#ffffff'} stroke={palette[c]} strokeWidth={training ? 1 : 2.2}/>{!training && <text x={x} y={y+1.7} textAnchor="middle">?</text>}</g>;
+        })}
+        <text x="5" y="95">outlined = held-out test record</text>
+      </svg>
+      <div className="control-panel">
+        <Range label="Training share" value={trainPercent} min={50} max={90} step={10} suffix="%" onChange={(value)=>{setTrainPercent(value);setTrained(false);}}/>
+        <div className="metric-pair"><div><small>Training records</small><b>{trainCount}</b></div><div><small>Test records</small><b>{classificationPoints.length-trainCount}</b></div></div>
+        <button className="primary-button inline" onClick={()=>setTrained(true)}>{trained?'Model fixed':'Fit on training data'} <ChevronRight/></button>
+        <p>{trained ? 'The boundary learned from training records can now be evaluated once on the untouched test records.' : 'The model may inspect training features and labels, but the test labels must not guide fitting.'}</p>
+      </div>
+    </div>
+  </section>;
+}
+
+const knnPoints = [
+  [18,25,0],[27,39,0],[33,18,0],[39,34,0],[24,58,0],[45,20,0],
+  [61,68,1],[70,54,1],[78,72,1],[65,84,1],[84,48,1],[54,74,1],
+] as const;
+
+export function KNNClassifierLab() {
+  const [k, setK] = useState(3);
+  const [queryX, setQueryX] = useState(52);
+  const [queryY, setQueryY] = useState(49);
+  const ranked = useMemo(() => knnPoints.map((point,index)=>({point,index,d:Math.hypot(point[0]-queryX,point[1]-queryY)})).sort((a,b)=>a.d-b.d),[queryX,queryY]);
+  const neighbors = ranked.slice(0,k);
+  const votes = neighbors.reduce((count,item)=>{count[item.point[2]]++;return count;},[0,0]);
+  const prediction = votes[0] > votes[1] ? 0 : 1;
+  return <section className="game-shell">
+    <div className="activity-kicker">Nearest-neighbor game</div><h2>Let nearby records vote</h2>
+    <p className="activity-prompt">Move the unknown record and change k. KNN delays modelling until a prediction is requested.</p>
+    <div className="viz-grid">
+      <svg className="plot classification-plot" viewBox="0 0 100 100" role="img" aria-label={`KNN predicts class ${prediction===0?'blue':'red'} with ${votes[prediction]} votes`}>
+        <circle cx={queryX} cy={queryY} r={Math.min(34,neighbors[neighbors.length-1]?.d ?? 0)} className="knn-radius"/>
+        {neighbors.map(item=><line key={`l${item.index}`} x1={queryX} y1={queryY} x2={item.point[0]} y2={item.point[1]} className="neighbor-line"/>)}
+        {knnPoints.map(([x,y,c],i)=><circle key={i} cx={x} cy={y} r={neighbors.some(n=>n.index===i)?5:3.7} fill={palette[c]} stroke="#fff" strokeWidth="1"/>)}
+        <circle cx={queryX} cy={queryY} r="5.5" fill="#ffc86b" stroke="#263248" strokeWidth="1.5"/><text x={queryX} y={queryY+2} textAnchor="middle">?</text>
+      </svg>
+      <div className="control-panel">
+        <Range label="Neighbors, k" value={k} min={1} max={9} step={2} onChange={setK}/><Range label="Unknown record x" value={queryX} min={15} max={85} onChange={setQueryX}/><Range label="Unknown record y" value={queryY} min={15} max={85} onChange={setQueryY}/>
+        <div className="vote-board"><span><i style={{background:palette[0]}}/>Blue votes <b>{votes[0]}</b></span><span><i style={{background:palette[1]}}/>Red votes <b>{votes[1]}</b></span></div>
+        <div className="recommendation"><small>Predicted class</small><strong>{prediction===0?'Blue':'Red'}</strong></div>
+        <p>Small k follows local detail and noise. Larger k smooths the boundary but can include points from another region.</p>
+      </div>
+    </div>
+  </section>;
+}
+
+const splitRecords = [[10,0],[18,0],[26,0],[34,1],[42,0],[51,1],[59,1],[68,0],[77,1],[88,1]] as const;
+const gini = (classes:number[]) => classes.length === 0 ? 0 : 1 - [0,1].reduce((sum,c)=>sum+(classes.filter(v=>v===c).length/classes.length)**2,0);
+
+export function DecisionTreeSplitLab() {
+  const [threshold,setThreshold] = useState(45);
+  const left = splitRecords.filter(([x])=>x<threshold).map(([,c])=>c);
+  const right = splitRecords.filter(([x])=>x>=threshold).map(([,c])=>c);
+  const weighted = (left.length*gini(left)+right.length*gini(right))/splitRecords.length;
+  const candidates = [15,22,30,38,46,55,64,73,83];
+  const best = candidates.reduce((winner,t)=>{
+    const l=splitRecords.filter(([x])=>x<t).map(([,c])=>c); const r=splitRecords.filter(([x])=>x>=t).map(([,c])=>c);
+    const score=(l.length*gini(l)+r.length*gini(r))/splitRecords.length;
+    return score<winner.score?{t,score}:winner;
+  },{t:candidates[0],score:Infinity});
+  return <section className="game-shell">
+    <div className="activity-kicker">Tree induction lab</div><h2>Search for a purer split</h2>
+    <p className="activity-prompt">Move the threshold. A decision tree prefers children whose class distributions are more homogeneous.</p>
+    <div className="viz-grid">
+      <div className="split-canvas">
+        <div className="split-axis"/><div className="split-marker" style={{left:`${threshold}%`}}><span>x &lt; {threshold}</span></div>
+        {splitRecords.map(([x,c],i)=><span className="split-record" key={i} style={{left:`${x}%`,top:`${c===0?38:58}%`,background:palette[c]}}/>)}
+        <div className="split-label left">Left child<br/><b>{left.length} records</b></div><div className="split-label right">Right child<br/><b>{right.length} records</b></div>
+      </div>
+      <div className="control-panel">
+        <Range label="Split threshold" value={threshold} min={12} max={90} step={2} onChange={setThreshold}/>
+        <div className="metric-pair"><div><small>Left Gini</small><b>{gini(left).toFixed(2)}</b></div><div><small>Right Gini</small><b>{gini(right).toFixed(2)}</b></div></div>
+        <div className={`impurity-score ${Math.abs(threshold-best.t)<=3?'best':''}`}><small>Weighted child impurity</small><strong>{weighted.toFixed(3)}</strong><span>{Math.abs(threshold-best.t)<=3?'Best region found':'Lower is better'}</span></div>
+        <p>Gini reaches 0 when a child contains one class only. The split score weights each child by its number of records.</p>
+      </div>
+    </div>
+  </section>;
+}
+
+const bayesFeatures = [
+  {name:'Has fur',mammal:.88,other:.12},
+  {name:'Produces milk',mammal:.94,other:.04},
+  {name:'Lays eggs',mammal:.08,other:.78},
+];
+
+export function NaiveBayesLab() {
+  const [observations,setObservations] = useState([true,true,false]);
+  const raw = [0,1].map(classIndex => bayesFeatures.reduce((score,feature,i)=>score*(observations[i] ? (classIndex===0?feature.mammal:feature.other) : 1-(classIndex===0?feature.mammal:feature.other)),classIndex===0?.55:.45));
+  const total = raw[0]+raw[1];
+  const posterior = raw.map(value=>value/total);
+  const prediction = posterior[0]>posterior[1]?0:1;
+  return <section className="game-shell">
+    <div className="activity-kicker">Probability lab</div><h2>Combine evidence with Naive Bayes</h2>
+    <p className="activity-prompt">Change the observed traits. The classifier multiplies each class prior by the conditional likelihood of the evidence.</p>
+    <div className="viz-grid">
+      <div className="bayes-animal" aria-label="Stylized unknown animal"><div className="animal-face"><span>?</span></div><p>Unknown animal</p></div>
+      <div className="control-panel">
+        <div className="evidence-list">{bayesFeatures.map((feature,i)=><button key={feature.name} className={observations[i]?'yes':'no'} onClick={()=>setObservations(observations.map((value,index)=>index===i?!value:value))}><span>{feature.name}</span><b>{observations[i]?'Yes':'No'}</b></button>)}</div>
+        <div className="posterior-bars"><div><span>Mammal</span><i><b style={{width:`${posterior[0]*100}%`,background:palette[0]}}/></i><strong>{Math.round(posterior[0]*100)}%</strong></div><div><span>Other</span><i><b style={{width:`${posterior[1]*100}%`,background:palette[1]}}/></i><strong>{Math.round(posterior[1]*100)}%</strong></div></div>
+        <div className="recommendation"><small>Most probable class</small><strong>{prediction===0?'Mammal':'Non-mammal'}</strong></div>
+        <p>The “naive” assumption treats traits as conditionally independent within each class. This makes the product simple, even when the assumption is imperfect.</p>
+      </div>
+    </div>
+  </section>;
+}
+
+const linearSvmPoints = [
+  [18,72,0],[26,64,0],[34,76,0],[36,55,0],[45,67,0],[53,58,0],
+  [48,37,1],[58,31,1],[65,43,1],[72,27,1],[79,38,1],[84,18,1],
+] as const;
+const moonA = [[15,58],[22,45],[31,38],[41,36],[51,42],[58,53]] as const;
+const moonB = [[38,67],[48,74],[59,73],[69,65],[76,53],[82,40]] as const;
+
+export function SVMKernelLab() {
+  const [dataset,setDataset] = useState<'linear'|'moons'>('linear');
+  const [kernel,setKernel] = useState<'linear'|'rbf'>('linear');
+  const [c,setC] = useState(4);
+  const [gamma,setGamma] = useState(3);
+  const margin = Math.max(5,20-c*1.4);
+  const mismatch = dataset==='moons'&&kernel==='linear';
+  const support = Math.max(3,Math.round(10-c/2+(kernel==='rbf'?gamma/2:0)));
+  const svmPoints: ReadonlyArray<readonly [number,number,number]> = dataset==='linear' ? linearSvmPoints : [...moonA.map(p=>[p[0],p[1],0] as const),...moonB.map(p=>[p[0],p[1],1] as const)];
+  return <section className="game-shell">
+    <div className="activity-kicker">Margin and kernel explorer</div><h2>Change the boundary the model can express</h2>
+    <p className="activity-prompt">Compare a straight separator with an RBF boundary. C controls the penalty for violations; gamma controls how local the RBF influence becomes.</p>
+    <div className="viz-grid">
+      <svg className="plot classification-plot svm-plot" viewBox="0 0 100 100" role="img" aria-label={`${kernel} SVM on ${dataset} data`}>
+        {kernel==='linear' ? <><line x1="13" y1="92" x2="91" y2="10" className="svm-boundary"/><line x1={13-margin/2} y1="92" x2={91-margin/2} y2="10" className="svm-margin"/><line x1={13+margin/2} y1="92" x2={91+margin/2} y2="10" className="svm-margin"/></> : <><path d={dataset==='linear'?`M10 ${94-gamma} C35 ${75-gamma}, 62 ${46+gamma}, 92 ${12+gamma}`:`M10 63 C28 ${34-gamma}, 50 ${38+gamma}, 57 55 S75 ${78-gamma}, 92 43`} className="svm-boundary"/><path d={dataset==='linear'?`M7 ${88-gamma} C35 ${69-gamma}, 65 ${40+gamma}, 94 ${8+gamma}`:`M8 70 C26 ${42-gamma}, 47 ${46+gamma}, 53 62 S77 ${86-gamma}, 95 50`} className="svm-margin"/></>}
+        {svmPoints.map(([x,y,cl],i)=><circle key={i} cx={x} cy={y} r={i<support?4.8:3.6} fill={palette[cl]} stroke={i<support?'#263248':'#fff'} strokeWidth={i<support?1.5:1}/>) }
+      </svg>
+      <div className="control-panel">
+        <div className="segmented"><button className={dataset==='linear'?'active':''} onClick={()=>setDataset('linear')}>Linear data</button><button className={dataset==='moons'?'active':''} onClick={()=>setDataset('moons')}>Moon data</button></div>
+        <div className="segmented"><button className={kernel==='linear'?'active':''} onClick={()=>setKernel('linear')}>Linear kernel</button><button className={kernel==='rbf'?'active':''} onClick={()=>setKernel('rbf')}>RBF kernel</button></div>
+        <Range label="C penalty" value={c} min={1} max={10} onChange={setC}/>{kernel==='rbf'&&<Range label="Gamma" value={gamma} min={1} max={9} onChange={setGamma}/>} 
+        <div className="metric-pair"><div><small>Approx. margin</small><b>{margin.toFixed(0)}</b></div><div><small>Highlighted support vectors</small><b>{support}</b></div></div>
+        <p>{mismatch?'A straight line cannot follow the curved class structure. The errors reveal a representation mismatch.':kernel==='rbf'?'The RBF kernel permits a curved boundary. Very large gamma can wrap tightly around individual points.':'A wide-margin linear separator suits this geometry and relies mainly on points near the boundary.'}</p>
+      </div>
+    </div>
+  </section>;
+}
+
 type Question={q:string;options:string[];correct:number;why:string};
 const quizzes:Record<string,Question[]>={
   'practice-1':[
@@ -248,6 +408,14 @@ const quizzes:Record<string,Question[]>={
     {q:'Why does a far-away x-value have high leverage?',options:['It is far from the mean of the inputs','Its residual is always zero','It has a missing target','It removes the intercept'],correct:0,why:'A point far from the center of x can strongly affect the fitted slope.'},
     {q:'When is the closed-form solution especially attractive?',options:['A modest number of features and a manageable matrix solve','An infinite feature space','Streaming data that never ends','Only when labels are missing'],correct:0,why:'Direct linear algebra is simple and exact when the feature matrix is not too large.'},
     {q:'If every residual doubles, what happens to its squared contribution?',options:['It doubles','It halves','It quadruples','It stays equal'],correct:2,why:'Squaring turns (2e)² into 4e².'},
+  ],
+  'practice-5':[
+    {q:'Why must the test set remain separate during model fitting?',options:['To make training slower','To estimate performance on unseen records','To increase the number of classes','To remove all noise'],correct:1,why:'An untouched test set provides evidence about generalization to records that did not guide the model.'},
+    {q:'What makes KNN a lazy learner?',options:['It ignores labels','It postpones most work until prediction time','It always uses k = 1','It trains only on missing values'],correct:1,why:'KNN stores training records and searches among them when a new record needs a label.'},
+    {q:'What does a Gini value of 0 at a tree node mean?',options:['The node contains one class','Classes are evenly mixed','The split failed','The node has no features'],correct:0,why:'A pure node assigns probability 1 to one class, so 1 minus the squared class probabilities equals 0.'},
+    {q:'A decision tree has tiny training error but much larger test error. What is the likely problem?',options:['Underfitting','Overfitting','Class balance improved','The labels became continuous'],correct:1,why:'A complex tree can fit noise and local accidents that do not repeat in unseen data.'},
+    {q:'Which assumption makes Naive Bayes computationally simple?',options:['Every class is equally likely','Features are conditionally independent given the class','All features are normally distributed','The classes are linearly separable'],correct:1,why:'Conditional independence lets the joint likelihood factor into a product of individual feature likelihoods.'},
+    {q:'Why can an RBF SVM classify moon-shaped classes better than a linear SVM?',options:['It removes the test set','Its kernel permits a nonlinear boundary','It never needs labels','It maximizes node purity'],correct:1,why:'The RBF kernel represents curved separation in the original feature space.'},
   ],
 };
 
@@ -318,6 +486,18 @@ const tutorialLabs: Record<number, TutorialLabDefinition> = {
       { title: 'Fit and interpret', outcome: 'Read inferential output alongside predictions.', prompt: 'Fit the relationship with SciPy and statsmodels. Compare estimated slope/intercept, R², the slope p-value, and residual plot.', starter: 'slope_hat, intercept_hat, r, p, stderr = stats.linregress(x, y)\nmodel = sm.OLS(y, sm.add_constant(x)).fit()\nprint(model.summary())', hint: 'R² describes explained sample variation; the p-value addresses evidence against a zero slope under model assumptions.', question: 'What does a high R² mean here?', options: ['The slope is causal', 'The fitted line explains much of the observed y variation', 'Every prediction is exact', 'The residuals must be normally distributed'], correct: 1, why: 'R² is an in-sample variance summary; it does not establish causality or validate every assumption.' },
       { title: 'Solve with matrix algebra', outcome: 'Connect the normal equation to the fitted line.', prompt: 'Add a column of ones to x and solve for intercept and slope using a stable linear-algebra routine.', starter: 'X = np.column_stack([np.ones_like(x), x])\nbeta = np.linalg.solve(X.T @ X, X.T @ y)\nintercept_hat, slope_hat = beta', hint: 'The ones column lets the matrix multiplication include a free intercept.', question: 'What would omitting the ones column impose?', options: ['A line forced through the origin', 'A quadratic curve', 'A second target variable', 'Automatic standardization'], correct: 0, why: 'Without a constant feature, the model has no independent intercept parameter.' },
       { title: 'Learn with gradient steps', outcome: 'Implement the same objective in PyTorch.', prompt: 'Train a one-input linear layer with mean squared error and SGD. Track loss and compare its learned parameters with the closed-form estimates.', starter: 'model = torch.nn.Linear(1, 1)\noptimizer = torch.optim.SGD(model.parameters(), lr=0.01)\nfor epoch in range(500):\n    optimizer.zero_grad()\n    loss = torch.nn.functional.mse_loss(model(x_tensor), y_tensor)\n    loss.___()\n    optimizer.step()', hint: 'PyTorch must propagate the loss gradient backward through the computation graph before the optimizer updates parameters.', question: 'What is the correct order inside the training loop?', options: ['step → backward → zero_grad', 'zero_grad → loss → backward → step', 'backward → data → model', 'loss → step → zero_grad → backward'], correct: 1, why: 'Clear old gradients, compute the current loss, backpropagate, then update the parameters.' },
+    ],
+  },
+  5: {
+    title: 'Compare classifier decision surfaces',
+    source: 'Week 5 · 05_classification.ipynb',
+    dataset: 'Synthetic linear, moons, and circles datasets',
+    duration: '60–90 min',
+    tasks: [
+      { title: 'Prepare comparable data', outcome: 'Create the three tutorial datasets and protect a test split.', prompt: 'Generate linear, moon, and circle datasets. Split each into training and test records, then fit StandardScaler on training features only.', starter: 'X_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.30, random_state=42, stratify=y\n)\nscaler = StandardScaler().fit(___)\nX_train = scaler.transform(X_train)\nX_test = scaler.transform(X_test)', hint: 'The scaler must learn its mean and variance from X_train, not from the held-out records.', question: 'Why use stratify=y in this split?', options: ['To keep similar class proportions in both sets','To sort features alphabetically','To make every point unique','To remove nonlinear structure'], correct: 0, why: 'Stratification reduces accidental class imbalance between training and test data.' },
+      { title: 'Compare model geometry', outcome: 'Relate decision surfaces to classifier assumptions.', prompt: 'Fit Gaussian Naive Bayes, logistic regression, and SVMs with linear, polynomial, and RBF kernels. Plot every decision surface on each dataset.', starter: 'models = [\n    GaussianNB(),\n    LogisticRegression(),\n    SVC(kernel="linear"),\n    SVC(kernel="poly"),\n    SVC(kernel=___)\n]\nfor model in models:\n    show_classifier(model, ax)', hint: 'The radial basis kernel is abbreviated with three lowercase letters.', question: 'Which model family should most naturally follow a curved moon boundary?', options: ['Linear logistic regression','Linear SVM','RBF SVM','A depth-1 decision tree'], correct: 2, why: 'An RBF kernel can express a nonlinear boundary that bends around the moon-shaped classes.' },
+      { title: 'Control tree complexity', outcome: 'Observe how depth changes bias and variance.', prompt: 'Fit decision trees across the tutorial depths and compare Gini with entropy. Record training and test accuracy beside each boundary.', starter: 'for depth in [1, 2, 3, 5, 8, 13, 21]:\n    for criterion in ["gini", "entropy"]:\n        tree = DecisionTreeClassifier(\n            max_depth=depth, criterion=criterion, random_state=42\n        ).fit(X_train, y_train)', hint: 'Look for jagged regions that isolate a few training points as depth becomes large.', question: 'Which observation provides the strongest evidence of overfitting?', options: ['Training and test accuracy both improve','Training accuracy rises while test accuracy falls','The tree has only one split','Both errors remain high'], correct: 1, why: 'A widening train–test gap shows that extra complexity fits training-specific details rather than reusable structure.' },
+      { title: 'Tune neighborhood voting', outcome: 'Compare smoothing from k and distance weighting.', prompt: 'Repeat KNN for k values from 1 to 21 with uniform and distance weights. Explain how the boundary changes on all three datasets.', starter: 'for k in [1, 2, 3, 5, 8, 13, 21]:\n    for weights in ["uniform", "distance"]:\n        knn = KNeighborsClassifier(\n            n_neighbors=k, weights=___\n        ).fit(X_train, y_train)', hint: 'Use the loop variable that switches between equal votes and stronger votes from closer neighbors.', question: 'What usually happens as k becomes large?', options: ['The boundary becomes smoother','Every point becomes a support vector','The tree becomes deeper','The class priors become equal'], correct: 0, why: 'A larger neighborhood averages over more records, reducing local variation and potentially underfitting small structures.' },
     ],
   },
 };
